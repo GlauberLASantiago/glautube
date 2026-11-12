@@ -1608,6 +1608,7 @@
       'use strict';
 
       const STORAGE_KEY = 'glautube_library_v1';
+      const LOCAL_SEED_URL = 'glautube-banco-inicial.json';
       const GITHUB_SEED_URL = 'https://raw.githubusercontent.com/GlauberLASantiago/glautube/main/glautube-banco-inicial.json';
 
       // Fallback offline caso o GitHub esteja inacessível na primeira execução
@@ -1639,7 +1640,8 @@
       // Estado Global
       let state = {
         videos: [],
-        playlists: {} // { [playlistId]: { id, name, importedAt } }
+        playlists: {}, // { [playlistId]: { id, name, importedAt } }
+        seedInitialized: false
       };
 
       let activeFilter = 'all'; // 'all' | 'watchlist' | 'completed' | 'playlist:<id>'
@@ -1704,6 +1706,78 @@
       function closeMobileSidebar() {
         leftSidebar.classList.remove('open');
         sidebarBackdrop.classList.remove('visible');
+      }
+
+      function parseYouTubeUrl(value) {
+        try {
+          const url = new URL(value.trim());
+          const host = url.hostname.toLowerCase();
+          if (host !== 'youtu.be' && host !== 'youtube.com' && !host.endsWith('.youtube.com')) return {};
+          const playlistId = url.searchParams.get('list');
+          const parts = url.pathname.split('/').filter(Boolean);
+          const videoId = host === 'youtu.be' ? parts[0]
+            : (url.searchParams.get('v') || (['embed', 'shorts', 'live'].includes(parts[0]) ? parts[1] : null));
+          if (playlistId && /^[a-zA-Z0-9_-]+$/.test(playlistId)) {
+            return { type: 'playlist', playlistId, videoId: videoId && /^[a-zA-Z0-9_-]{11}$/.test(videoId) ? videoId : null };
+          }
+          if (videoId && /^[a-zA-Z0-9_-]{11}$/.test(videoId)) return { type: 'video', videoId };
+        } catch (err) {
+          return {};
+        }
+        return {};
+      }
+
+      function updateInputDetectionUI() {
+        const { type } = parseYouTubeUrl(urlInput.value);
+        detectedTypePill.textContent = type === 'playlist' ? 'Playlist' : 'Vídeo';
+        playlistNameRow.classList.toggle('visible', type === 'playlist');
+        btnSubmitLabel.textContent = type === 'playlist' ? 'Importar Playlist' : 'Adicionar';
+      }
+
+      function handleAddSingleVideo(videoId) {
+        if (state.videos.some((video) => video.id === videoId)) {
+          showToast('Este vídeo já está na sua biblioteca.');
+          return;
+        }
+        state.videos.push({
+          id: videoId, title: `Vídeo (${videoId})`, author: 'YouTube',
+          currentTime: 0, duration: 0, lastWatched: null, completed: false,
+          playlistId: null, playlistName: null
+        });
+        saveLibrary();
+        renderAll();
+        urlInput.value = '';
+        updateInputDetectionUI();
+        showToast('Vídeo adicionado à biblioteca.');
+      }
+
+      function handleImportPlaylist() {
+        showToast('A importação de playlists por link não está disponível. Importe um backup JSON.');
+      }
+
+      function getProgressPercent(video) {
+        if (video.completed) return 100;
+        return video.duration > 0 ? Math.min(100, Math.max(0, (video.currentTime || 0) / video.duration * 100)) : 0;
+      }
+
+      function isVideoCompleted(video) {
+        return Boolean(video.completed) || getProgressPercent(video) >= 95;
+      }
+
+      function isVideoInProgress(video) {
+        return video.currentTime > 0 && !isVideoCompleted(video);
+      }
+
+      function formatTime(seconds) {
+        const total = Math.max(0, Math.floor(Number(seconds) || 0));
+        const hours = Math.floor(total / 3600);
+        const minutes = Math.floor((total % 3600) / 60);
+        const secs = String(total % 60).padStart(2, '0');
+        return hours ? `${hours}:${String(minutes).padStart(2, '0')}:${secs}` : `${minutes}:${secs}`;
+      }
+
+      function formatRemainingText(currentTime, duration) {
+        return duration > 0 ? `Faltam ${formatTime(Math.max(0, duration - currentTime))}` : 'Duração desconhecida';
       }
 
       // ======================================================================
@@ -1936,18 +2010,27 @@
         if (btnSide) btnSide.disabled = true;
 
         try {
-          const response = await fetch(`${GITHUB_SEED_URL}?t=${Date.now()}`, { cache: 'no-store' });
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+          let parsed;
+          let lastError;
+          for (const url of [LOCAL_SEED_URL, GITHUB_SEED_URL]) {
+            try {
+              const response = await fetch(url, { cache: 'no-store' });
+              if (!response.ok) throw new Error(`HTTP ${response.status}`);
+              const candidate = parseSeedOrBackupJson(await response.json());
+              if (candidate.videos.length === 0) {
+                throw new Error('Nenhum vídeo válido encontrado no JSON.');
+              }
+              parsed = candidate;
+              break;
+            } catch (err) {
+              lastError = err;
+              console.warn(`Falha ao carregar banco inicial de ${url}:`, err);
+            }
           }
-          const json = await response.json();
-          const parsed = parseSeedOrBackupJson(json);
-
-          if (parsed.videos.length === 0) {
-            throw new Error('Nenhum vídeo válido encontrado no JSON remoto.');
-          }
+          if (!parsed) throw lastError;
 
           const { addedVideos, addedPlaylists } = mergeSeedDataIntoState(parsed, false);
+          state.seedInitialized = true;
           saveLibrary();
           renderAll();
 
@@ -1980,23 +2063,23 @@
         try {
           const raw = localStorage.getItem(STORAGE_KEY);
           if (!raw) {
-            state = { videos: [], playlists: {} };
-            renderAll();
-            fetchAndApplyGitHubSeed({ isFirstRun: true });
-            return;
-          }
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) {
-            state = { videos: parsed, playlists: {} };
+            state = { videos: [], playlists: {}, seedInitialized: false };
           } else {
-            state = {
-              videos: Array.isArray(parsed.videos) ? parsed.videos : [],
-              playlists: parsed.playlists && typeof parsed.playlists === 'object' ? parsed.playlists : {}
-            };
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+              state = { videos: parsed, playlists: {}, seedInitialized: false };
+            } else {
+              state = {
+                videos: Array.isArray(parsed.videos) ? parsed.videos : [],
+                playlists: parsed.playlists && typeof parsed.playlists === 'object' ? parsed.playlists : {},
+                seedInitialized: parsed.seedInitialized === true
+              };
+            }
           }
+          if (!state.seedInitialized) fetchAndApplyGitHubSeed({ isFirstRun: !raw });
         } catch (err) {
           console.error('Erro ao carregar GlauTube localStorage:', err);
-          state = { videos: [], playlists: {} };
+          state = { videos: [], playlists: {}, seedInitialized: false };
           fetchAndApplyGitHubSeed({ isFirstRun: true });
         }
       }
