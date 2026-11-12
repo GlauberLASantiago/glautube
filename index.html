@@ -1360,7 +1360,7 @@
             type="text"
             id="playlist-custom-name"
             class="playlist-name-input"
-            placeholder="Nome opcional da coleção (ex: Curso Python, Filmes Sci-Fi)..."
+            placeholder="Nome opcional da coleção (ex: Filmes Clássicos, Curso Python)..."
           />
         </div>
 
@@ -1378,14 +1378,14 @@
 
       <!-- Backup JSON (Exportar / Importar) -->
       <div class="header-actions">
-        <button type="button" id="btn-reload-seed-top" class="btn-ghost" title="Recarregar ou mesclar catálogo inicial do GitHub">
+        <button type="button" id="btn-reload-seed-top" class="btn-ghost" title="Sincronizar catálogo inicial do GitHub">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="23 4 23 10 17 10"></polyline>
             <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
           </svg>
           <span class="btn-label-desktop">Banco Inicial</span>
         </button>
-        <button type="button" id="btn-export-json" class="btn-ghost" title="Exportar backup JSON para transferir entre dispositivos">
+        <button type="button" id="btn-export-json" class="btn-ghost" title="Exportar backup JSON">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="7 10 12 15 17 10"></polyline>
@@ -1429,10 +1429,10 @@
           <nav id="sidebar-nav-list" class="sidebar-nav-list" aria-label="Filtros Gerais"></nav>
         </div>
 
-        <!-- Seção 2: Playlists (lista vertical, uma abaixo da outra) -->
+        <!-- Seção 2: Minhas Playlists (lista vertical, uma abaixo da outra) -->
         <div class="sidebar-group">
           <div class="sidebar-section-header">
-            <span class="sidebar-section-title">Playlists</span>
+            <span class="sidebar-section-title">Minhas Playlists</span>
             <span id="sidebar-playlists-total" class="sidebar-count">0</span>
           </div>
           <div id="sidebar-playlists-list" class="sidebar-playlists-list" role="navigation" aria-label="Lista de Playlists"></div>
@@ -1446,15 +1446,23 @@
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
           </svg>
-          <span>Importar Playlist</span>
+          <span>+ Nova Playlist / Vídeo</span>
         </button>
         <button type="button" id="btn-sidebar-restore-seed" class="btn-sidebar-action secondary">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="23 4 23 10 17 10"></polyline>
             <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
           </svg>
-          <span>Restaurar Catálogo Inicial</span>
+          <span>Sincronizar Banco Inicial</span>
         </button>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem;">
+          <button type="button" id="btn-sidebar-export" class="btn-sidebar-action secondary" style="font-size: 0.76rem; padding: 0.48rem;">
+            <span>Exportar JSON</span>
+          </button>
+          <button type="button" id="btn-sidebar-import" class="btn-sidebar-action secondary" style="font-size: 0.76rem; padding: 0.48rem;">
+            <span>Importar JSON</span>
+          </button>
+        </div>
       </div>
     </aside>
 
@@ -1528,6 +1536,15 @@
                 </svg>
                 <span>Próximo da Fila</span>
               </button>
+
+              <!-- Seletor rápido para mover o vídeo atual de playlist -->
+              <select
+                id="select-move-playlist"
+                aria-label="Mover vídeo para outra playlist"
+                style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.46rem 0.65rem; font-size: 0.8rem; font-weight: 600; outline: none; cursor: pointer;"
+              >
+                <option value="">Minha Lista (Sem Playlist)</option>
+              </select>
             </div>
 
             <div class="sync-status" id="sync-status-text">
@@ -1591,7 +1608,7 @@
 
   <!-- Rodapé -->
   <footer class="app-footer">
-    <p><strong>GlauTube</strong> — Seu Controlador Pessoal de Streaming do YouTube. Progresso salvo localmente no seu navegador.</p>
+    <p><strong>GlauTube</strong> — Desenvolvido pelo Prof. Glauber Santiago (DAC/UFSCar)</p>
   </footer>
 
   <!-- Elemento Oculto para Extração de Playlist via YouTube IFrame API -->
@@ -1601,7 +1618,7 @@
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
   <!-- ========================================================================
-       LÓGICA DO GLAUTUBE (PLAYER, IMPORTADOR DE PLAYLIST E PERSISTÊNCIA)
+       LÓGICA DO GLAUTUBE (COMPLETA, AUTOSSUFICIENTE E À PROVA DE FALHAS)
        ======================================================================== -->
   <script>
     (function () {
@@ -1610,7 +1627,7 @@
       const STORAGE_KEY = 'glautube_library_v1';
       const GITHUB_SEED_URL = 'https://raw.githubusercontent.com/GlauberLASantiago/glautube/main/glautube-banco-inicial.json';
 
-      // Fallback offline caso o GitHub esteja inacessível na primeira execução
+      // Catálogo padrão caso o GitHub demore ou não haja internet na primeira execução
       const OFFLINE_FALLBACK_VIDEOS = [
         {
           id: 'aqz-KE-bpKQ',
@@ -1620,8 +1637,10 @@
           duration: 634,
           lastWatched: null,
           completed: false,
-          playlistId: null,
-          playlistName: null
+          playlistId: 'pl_filmes_abertos',
+          playlistName: 'Filmes e Curtas Sci-Fi / Animação',
+          playlistOrder: 0,
+          thumb: 'https://i.ytimg.com/vi/aqz-KE-bpKQ/hqdefault.jpg'
         },
         {
           id: 'R6MlUcmOul8',
@@ -1631,8 +1650,23 @@
           duration: 734,
           lastWatched: null,
           completed: false,
-          playlistId: null,
-          playlistName: null
+          playlistId: 'pl_filmes_abertos',
+          playlistName: 'Filmes e Curtas Sci-Fi / Animação',
+          playlistOrder: 1,
+          thumb: 'https://i.ytimg.com/vi/R6MlUcmOul8/hqdefault.jpg'
+        },
+        {
+          id: 'eRsGyueVLvQ',
+          title: 'Sintel - Third Open Movie by Blender Foundation',
+          author: 'Blender Foundation',
+          currentTime: 0,
+          duration: 888,
+          lastWatched: null,
+          completed: false,
+          playlistId: 'pl_filmes_abertos',
+          playlistName: 'Filmes e Curtas Sci-Fi / Animação',
+          playlistOrder: 2,
+          thumb: 'https://i.ytimg.com/vi/eRsGyueVLvQ/hqdefault.jpg'
         }
       ];
 
@@ -1642,9 +1676,10 @@
         playlists: {} // { [playlistId]: { id, name, importedAt } }
       };
 
-      let activeFilter = 'all'; // 'all' | 'watchlist' | 'completed' | 'playlist:<id>'
+      let activeFilter = 'all'; // 'all' | 'continue' | 'watchlist' | 'completed' | 'playlist:<id>'
       let activeVideoId = null;
       let ytPlayer = null;
+      let extractorPlayer = null;
       let isYtApiReady = false;
       let pendingVideoToPlay = null;
       let progressSaveTimer = null;
@@ -1678,6 +1713,7 @@
       const cinemaVideoTitle = document.getElementById('cinema-video-title');
       const syncStatusText = document.getElementById('sync-status-text');
       const btnNextInQueue = document.getElementById('btn-next-in-queue');
+      const selectMovePlaylist = document.getElementById('select-move-playlist');
 
       const shelfContinue = document.getElementById('shelf-continue');
       const playlistsShelvesContainer = document.getElementById('playlists-shelves-container');
@@ -1694,7 +1730,418 @@
       const importFileInput = document.getElementById('import-file-input');
 
       // ======================================================================
-      // CONTROLE DA SIDEBAR MOBILE
+      // 1. FUNÇÕES AUXILIARES DE TEMPO, PROGRESSO E PARSER DE URLS DO YOUTUBE
+      // ======================================================================
+      function formatTime(totalSeconds) {
+        const sec = Math.max(0, Math.floor(Number(totalSeconds) || 0));
+        const h = Math.floor(sec / 3600);
+        const m = Math.floor((sec % 3600) / 60);
+        const s = sec % 60;
+        const mm = String(m).padStart(2, '0');
+        const ss = String(s).padStart(2, '0');
+        return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
+      }
+
+      function formatRemainingText(currentTime, duration) {
+        const cur = Math.max(0, Number(currentTime) || 0);
+        const dur = Math.max(0, Number(duration) || 0);
+        if (dur <= 0 || cur >= dur) return 'Em andamento';
+        const remSec = Math.max(0, dur - cur);
+        const remMin = Math.ceil(remSec / 60);
+        if (remMin >= 60) {
+          const h = Math.floor(remMin / 60);
+          const m = remMin % 60;
+          return `Faltam ${h}h ${m}min`;
+        }
+        return `Faltam ${remMin} min`;
+      }
+
+      function isVideoCompleted(video) {
+        if (!video) return false;
+        if (Boolean(video.completed)) return true;
+        const cur = Number(video.currentTime) || 0;
+        const dur = Number(video.duration) || 0;
+        return dur > 0 && (cur / dur) >= 0.95;
+      }
+
+      function isVideoInProgress(video) {
+        if (!video || isVideoCompleted(video)) return false;
+        const cur = Number(video.currentTime) || 0;
+        return cur > 3;
+      }
+
+      function getProgressPercent(video) {
+        if (!video) return 0;
+        if (isVideoCompleted(video)) return 100;
+        const cur = Number(video.currentTime) || 0;
+        const dur = Number(video.duration) || 0;
+        if (dur > 0) {
+          return Math.min(99, Math.max(2, (cur / dur) * 100));
+        }
+        return cur > 3 ? 28 : 0;
+      }
+
+      /**
+       * Extrai tanto ID de vídeo (11 caracteres) quanto ID de playlist (list=...)
+       */
+      function parseYouTubeUrl(input) {
+        const raw = String(input || '').trim();
+        if (!raw) return { type: 'invalid', videoId: null, playlistId: null };
+
+        // ID direto de 11 caracteres
+        if (/^[a-zA-Z0-9_-]{11}$/.test(raw)) {
+          return { type: 'video', videoId: raw, playlistId: null };
+        }
+
+        // ID direto de playlist (PL..., OLAK..., UU..., FL...)
+        if (/^(PL|OLAK5uy_|UU|FL|RD)[a-zA-Z0-9_-]{10,}$/.test(raw)) {
+          return { type: 'playlist', videoId: null, playlistId: raw };
+        }
+
+        let videoId = null;
+        let playlistId = null;
+
+        try {
+          const urlStr = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+          const parsedUrl = new URL(urlStr);
+          const listParam = parsedUrl.searchParams.get('list');
+          if (listParam && listParam.length >= 6) {
+            playlistId = listParam;
+          }
+
+          const vParam = parsedUrl.searchParams.get('v');
+          if (vParam && /^[a-zA-Z0-9_-]{11}$/.test(vParam)) {
+            videoId = vParam;
+          }
+
+          if (!videoId) {
+            const pathMatch = parsedUrl.pathname.match(/\/(?:youtu\.be\/|shorts\/|embed\/|live\/|v\/)([a-zA-Z0-9_-]{11})/);
+            if (pathMatch) {
+              videoId = pathMatch[1];
+            } else if (parsedUrl.hostname.includes('youtu.be')) {
+              const seg = parsedUrl.pathname.replace(/^\/+/, '').split('/')[0];
+              if (/^[a-zA-Z0-9_-]{11}$/.test(seg)) videoId = seg;
+            }
+          }
+        } catch (err) {
+          // Fallback via regex se não for uma URL bem formada
+          const listRegex = raw.match(/[?&]list=([a-zA-Z0-9_-]+)/);
+          if (listRegex) playlistId = listRegex[1];
+
+          const vidRegex = raw.match(/(?:v=|youtu\.be\/|shorts\/|embed\/)([a-zA-Z0-9_-]{11})/);
+          if (vidRegex) videoId = vidRegex[1];
+        }
+
+        if (playlistId) {
+          return { type: 'playlist', videoId, playlistId };
+        }
+        if (videoId) {
+          return { type: 'video', videoId, playlistId: null };
+        }
+        return { type: 'invalid', videoId: null, playlistId: null };
+      }
+
+      function updateInputDetectionUI() {
+        const parsed = parseYouTubeUrl(urlInput.value);
+        if (parsed.type === 'playlist') {
+          detectedTypePill.textContent = 'Playlist';
+          detectedTypePill.classList.add('visible');
+          playlistNameRow.classList.add('visible');
+          btnSubmitLabel.textContent = 'Importar Playlist';
+        } else if (parsed.type === 'video') {
+          detectedTypePill.textContent = 'Vídeo';
+          detectedTypePill.classList.add('visible');
+          playlistNameRow.classList.remove('visible');
+          btnSubmitLabel.textContent = 'Adicionar Vídeo';
+        } else {
+          detectedTypePill.classList.remove('visible');
+          playlistNameRow.classList.remove('visible');
+          btnSubmitLabel.textContent = 'Adicionar';
+        }
+      }
+
+      async function fetchVideoMetadataNoembed(videoId) {
+        try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 4500);
+          const resp = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`, {
+            signal: controller.signal
+          });
+          clearTimeout(timer);
+          if (!resp.ok) throw new Error('Falha noembed');
+          const data = await resp.json();
+          return {
+            title: (data && data.title) ? String(data.title).trim() : `Vídeo do YouTube (${videoId})`,
+            author: (data && data.author_name) ? String(data.author_name).trim() : 'YouTube'
+          };
+        } catch (e) {
+          return {
+            title: `Vídeo do YouTube (${videoId})`,
+            author: 'YouTube'
+          };
+        }
+      }
+
+      // ======================================================================
+      // 2. ADIÇÃO DE VÍDEO INDIVIDUAL E IMPORTAÇÃO DE PLAYLIST POR LINK
+      // ======================================================================
+      async function handleAddSingleVideo(videoId) {
+        if (!videoId || isImporting) return;
+
+        // Se o usuário estiver dentro de uma playlist específica na barra lateral, adiciona nela
+        let targetPlId = null;
+        let targetPlName = null;
+        if (activeFilter.startsWith('playlist:')) {
+          const plId = activeFilter.replace('playlist:', '');
+          if (state.playlists[plId]) {
+            targetPlId = plId;
+            targetPlName = state.playlists[plId].name;
+          }
+        }
+
+        const existing = state.videos.find((v) => v.id === videoId);
+        if (existing) {
+          urlInput.value = '';
+          updateInputDetectionUI();
+          openVideoInCinema(existing.id);
+          showToast(`"${existing.title}" já estava na sua biblioteca! Abrindo no player...`);
+          return;
+        }
+
+        btnSubmitImport.disabled = true;
+        btnSubmitLabel.textContent = 'Buscando...';
+
+        try {
+          const meta = await fetchVideoMetadataNoembed(videoId);
+          const newVideo = {
+            id: videoId,
+            title: meta.title,
+            author: meta.author,
+            currentTime: 0,
+            duration: 0,
+            lastWatched: null,
+            completed: false,
+            playlistId: targetPlId,
+            playlistName: targetPlName,
+            playlistOrder: state.videos.filter((v) => v.playlistId === targetPlId).length,
+            thumb: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
+          };
+
+          state.videos.unshift(newVideo);
+          saveLibrary();
+          renderAll();
+
+          urlInput.value = '';
+          updateInputDetectionUI();
+          showToast(`Adicionado: "${newVideo.title}"`, 'Assistir Agora', () => {
+            openVideoInCinema(newVideo.id);
+          });
+        } finally {
+          btnSubmitImport.disabled = false;
+          updateInputDetectionUI();
+        }
+      }
+
+      /**
+       * Extrai a lista de IDs de uma playlist usando o player oculto da YouTube IFrame API
+       */
+      function extractPlaylistVideoIdsViaIframe(playlistId) {
+        return new Promise((resolve) => {
+          let settled = false;
+          const finish = (ids) => {
+            if (settled) return;
+            settled = true;
+            resolve(Array.isArray(ids) ? ids : []);
+          };
+
+          // Timeout de segurança de 8 segundos para nunca travar a UI
+          const safetyTimeout = setTimeout(() => {
+            if (extractorPlayer && typeof extractorPlayer.getPlaylist === 'function') {
+              try {
+                const list = extractorPlayer.getPlaylist();
+                if (Array.isArray(list) && list.length > 0) {
+                  finish(list);
+                  return;
+                }
+              } catch (e) {}
+            }
+            finish([]);
+          }, 8000);
+
+          const pollForPlaylistArray = (playerInstance) => {
+            let attempts = 0;
+            const interval = setInterval(() => {
+              attempts++;
+              try {
+                const arr = playerInstance.getPlaylist();
+                if (Array.isArray(arr) && arr.length > 0) {
+                  clearInterval(interval);
+                  clearTimeout(safetyTimeout);
+                  finish(arr);
+                } else if (attempts >= 22) {
+                  clearInterval(interval);
+                  clearTimeout(safetyTimeout);
+                  finish([]);
+                }
+              } catch (err) {
+                if (attempts >= 22) {
+                  clearInterval(interval);
+                  clearTimeout(safetyTimeout);
+                  finish([]);
+                }
+              }
+            }, 300);
+          };
+
+          if (!window.YT || !window.YT.Player) {
+            clearTimeout(safetyTimeout);
+            finish([]);
+            return;
+          }
+
+          try {
+            if (extractorPlayer && typeof extractorPlayer.cuePlaylist === 'function') {
+              extractorPlayer.cuePlaylist({ listType: 'playlist', list: playlistId });
+              pollForPlaylistArray(extractorPlayer);
+            } else {
+              extractorPlayer = new YT.Player('hidden-playlist-extractor', {
+                height: '180',
+                width: '180',
+                playerVars: {
+                  listType: 'playlist',
+                  list: playlistId,
+                  autoplay: 0,
+                  controls: 0
+                },
+                events: {
+                  onReady: (ev) => {
+                    try {
+                      ev.target. mute();
+                      ev.target.cuePlaylist({ listType: 'playlist', list: playlistId });
+                      pollForPlaylistArray(ev.target);
+                    } catch (e) {
+                      finish([]);
+                    }
+                  },
+                  onError: () => {
+                    clearTimeout(safetyTimeout);
+                    finish([]);
+                  }
+                }
+              });
+            }
+          } catch (e) {
+            clearTimeout(safetyTimeout);
+            finish([]);
+          }
+        });
+      }
+
+      async function handleImportPlaylist(playlistId, customName) {
+        if (!playlistId || isImporting) return;
+
+        const parsedCurrent = parseYouTubeUrl(urlInput.value);
+        isImporting = true;
+        btnSubmitImport.disabled = true;
+        importProgressBox.classList.add('visible');
+        importProgressLabel.textContent = 'Conectando ao YouTube para ler os vídeos da playlist...';
+        importProgressPercent.textContent = '10%';
+        importBarFill.style.width = '10%';
+
+        try {
+          let videoIds = await extractPlaylistVideoIdsViaIframe(playlistId);
+
+          // Se a URL tinha também um vídeo específico (?v=...&list=...) e a playlist veio vazia, ao menos inclui o vídeo
+          if ((!videoIds || videoIds.length === 0) && parsedCurrent.videoId) {
+            videoIds = [parsedCurrent.videoId];
+          }
+
+          if (!videoIds || videoIds.length === 0) {
+            showToast('Não foi possível ler esta playlist (verifique se ela é Pública ou Não Listada no YouTube).');
+            return;
+          }
+
+          // Remove duplicatas mantendo ordem
+          const uniqueIds = [...new Set(videoIds.filter((id) => /^[a-zA-Z0-9_-]{11}$/.test(id)))];
+          const total = uniqueIds.length;
+
+          const finalPlaylistName = customName || (state.playlists[playlistId] && state.playlists[playlistId].name) || `Playlist (${playlistId.slice(0, 8)})`;
+          state.playlists[playlistId] = {
+            id: playlistId,
+            name: finalPlaylistName,
+            importedAt: Date.now()
+          };
+
+          // Busca metadados em lotes de 5 para ser rápido e mostrar barra de progresso
+          const batchSize = 5;
+          let processed = 0;
+          let addedCount = 0;
+
+          for (let i = 0; i < uniqueIds.length; i += batchSize) {
+            const batch = uniqueIds.slice(i, i + batchSize);
+            const metas = await Promise.all(batch.map((id) => fetchVideoMetadataNoembed(id)));
+
+            batch.forEach((vidId, idx) => {
+              const orderIndex = i + idx;
+              const meta = metas[idx];
+              const existing = state.videos.find((v) => v.id === vidId);
+
+              if (!existing) {
+                state.videos.push({
+                  id: vidId,
+                  title: meta.title,
+                  author: meta.author,
+                  currentTime: 0,
+                  duration: 0,
+                  lastWatched: null,
+                  completed: false,
+                  playlistId: playlistId,
+                  playlistName: finalPlaylistName,
+                  playlistOrder: orderIndex,
+                  thumb: `https://i.ytimg.com/vi/${vidId}/hqdefault.jpg`
+                });
+                addedCount++;
+              } else {
+                existing.playlistId = playlistId;
+                existing.playlistName = finalPlaylistName;
+                existing.playlistOrder = orderIndex;
+                if (existing.title.startsWith('Vídeo') && meta.title) {
+                  existing.title = meta.title;
+                }
+              }
+            });
+
+            processed += batch.length;
+            const pct = Math.min(100, Math.round((processed / total) * 100));
+            importProgressLabel.textContent = `Importando "${finalPlaylistName}" (${processed}/${total} vídeos)...`;
+            importProgressPercent.textContent = `${pct}%`;
+            importBarFill.style.width = `${pct}%`;
+          }
+
+          activeFilter = `playlist:${playlistId}`;
+          saveLibrary();
+          renderAll();
+
+          urlInput.value = '';
+          playlistCustomNameInput.value = '';
+          updateInputDetectionUI();
+          showToast(`Playlist "${finalPlaylistName}" importada com ${total} vídeos!`);
+        } catch (err) {
+          console.error('Erro ao importar playlist:', err);
+          showToast('Ocorreu um erro ao importar a playlist.');
+        } finally {
+          isImporting = false;
+          btnSubmitImport.disabled = false;
+          setTimeout(() => {
+            importProgressBox.classList.remove('visible');
+            importBarFill.style.width = '0%';
+          }, 900);
+          updateInputDetectionUI();
+        }
+      }
+
+      // ======================================================================
+      // 3. CONTROLE DA SIDEBAR MOBILE
       // ======================================================================
       function openMobileSidebar() {
         leftSidebar.classList.add('open');
@@ -1707,7 +2154,7 @@
       }
 
       // ======================================================================
-      // PERSISTÊNCIA LOCAL & PARSER RESILIENTE DO BANCO INICIAL (GITHUB)
+      // 4. PERSISTÊNCIA LOCAL & PARSER RESILIENTE DO BANCO INICIAL (GITHUB)
       // ======================================================================
       function slugifyPlaylistName(name) {
         return 'pl_' + String(name || 'colecao')
@@ -1726,11 +2173,40 @@
         return parsed.videoId || null;
       }
 
+      function sanitizeVideoItem(item, index = 0, fallbackPlId = null, fallbackPlName = null) {
+        if (!item) return null;
+        const vid = typeof item === 'string'
+          ? extractCleanVideoId(item)
+          : extractCleanVideoId(item.id || item.videoId || item.url || item.link || item.youtubeUrl);
+
+        if (!vid) return null;
+
+        const rawPlName = (typeof item === 'object' && (item.playlistName || item.playlist || item.category || item.categoria || item.genero || item.collection)) || fallbackPlName || null;
+        let plId = (typeof item === 'object' && item.playlistId) || fallbackPlId || null;
+        if (!plId && rawPlName) {
+          plId = slugifyPlaylistName(rawPlName);
+        }
+
+        const cur = Math.max(0, Number(item.currentTime ?? item.time ?? item.progress ?? 0) || 0);
+        const dur = Math.max(0, Number(item.duration ?? item.totalTime ?? 0) || 0);
+
+        return {
+          id: vid,
+          title: String((item && (item.title || item.titulo || item.nome || item.name)) || `Filme / Vídeo (${vid})`).trim(),
+          author: String((item && (item.author || item.canal || item.channel)) || 'YouTube').trim(),
+          currentTime: cur,
+          duration: dur,
+          lastWatched: Number(item.lastWatched || item.updatedAt || 0) || null,
+          completed: Boolean(item.completed || (dur > 0 && cur / dur >= 0.95)),
+          playlistId: plId,
+          playlistName: rawPlName,
+          playlistOrder: typeof item.playlistOrder === 'number' ? item.playlistOrder : index,
+          thumb: `https://i.ytimg.com/vi/${vid}/hqdefault.jpg`
+        };
+      }
+
       /**
-       * Parser resiliente capaz de interpretar qualquer estrutura de JSON:
-       * 1) { videos: [...], playlists: { id: { id, name } } ou [...] }
-       * 2) Array raiz de vídeos [ { id/url, title, playlist/playlistName/category } ]
-       * 3) Objeto raiz agrupado por coleção { "Filmes Ação": [ ... ], "Ficção": [ ... ] }
+       * Parser 100% à prova de falhas para `glautube-banco-inicial.json` ou qualquer backup JSON
        */
       function parseSeedOrBackupJson(rawJson) {
         const normalizedPlaylists = {};
@@ -1740,121 +2216,81 @@
           return { playlists: normalizedPlaylists, videos: normalizedVideos };
         }
 
-        // Caso A: Possui playlists explicitamente declaradas
+        // 1. Processa playlists explícitas (Array ou Objeto)
         if (rawJson.playlists) {
           if (Array.isArray(rawJson.playlists)) {
             rawJson.playlists.forEach((pl) => {
               if (!pl) return;
-              const plId = pl.id || slugifyPlaylistName(pl.name || pl.title);
-              const plName = pl.name || pl.title || plId;
+              const plName = typeof pl === 'string' ? pl : (pl.name || pl.title || pl.nome || pl.id || 'Coleção');
+              const plId = (typeof pl === 'object' && pl.id) ? String(pl.id) : slugifyPlaylistName(plName);
               normalizedPlaylists[plId] = {
                 id: plId,
-                name: plName,
-                importedAt: pl.importedAt || Date.now()
+                name: String(plName).trim(),
+                importedAt: (pl && pl.importedAt) || Date.now()
               };
-              // Se os vídeos vierem aninhados dentro de cada playlist
-              if (Array.isArray(pl.videos)) {
-                pl.videos.forEach((v, idx) => {
-                  const vid = extractCleanVideoId(v.id || v.videoId || v.url || v.link);
-                  if (!vid) return;
-                  normalizedVideos.push({
-                    id: vid,
-                    title: v.title || v.nome || `Vídeo (${vid})`,
-                    author: v.author || v.canal || 'YouTube',
-                    currentTime: Number(v.currentTime) || 0,
-                    duration: Number(v.duration) || 0,
-                    lastWatched: v.lastWatched || null,
-                    completed: Boolean(v.completed),
-                    playlistId: plId,
-                    playlistName: plName,
-                    playlistOrder: typeof v.playlistOrder === 'number' ? v.playlistOrder : idx
-                  });
+
+              if (Array.isArray(pl.videos || pl.items)) {
+                (pl.videos || pl.items).forEach((v, idx) => {
+                  const clean = sanitizeVideoItem(v, idx, plId, normalizedPlaylists[plId].name);
+                  if (clean) normalizedVideos.push(clean);
                 });
               }
             });
           } else if (typeof rawJson.playlists === 'object') {
             Object.entries(rawJson.playlists).forEach(([key, val]) => {
               if (!val) return;
-              const plId = val.id || key;
-              const plName = typeof val === 'string' ? val : (val.name || val.title || key);
+              const plId = (val && val.id) ? String(val.id) : key;
+              const plName = typeof val === 'string' ? val : (val.name || val.title || val.nome || key);
               normalizedPlaylists[plId] = {
                 id: plId,
-                name: plName,
-                importedAt: val.importedAt || Date.now()
+                name: String(plName).trim(),
+                importedAt: (val && val.importedAt) || Date.now()
               };
-              if (Array.isArray(val.videos)) {
-                val.videos.forEach((v, idx) => {
-                  const vid = extractCleanVideoId(v.id || v.videoId || v.url || v.link);
-                  if (!vid) return;
-                  normalizedVideos.push({
-                    id: vid,
-                    title: v.title || v.nome || `Vídeo (${vid})`,
-                    author: v.author || v.canal || 'YouTube',
-                    currentTime: Number(v.currentTime) || 0,
-                    duration: Number(v.duration) || 0,
-                    lastWatched: v.lastWatched || null,
-                    completed: Boolean(v.completed),
-                    playlistId: plId,
-                    playlistName: plName,
-                    playlistOrder: typeof v.playlistOrder === 'number' ? v.playlistOrder : idx
-                  });
+
+              if (Array.isArray(val.videos || val.items)) {
+                (val.videos || val.items).forEach((v, idx) => {
+                  const clean = sanitizeVideoItem(v, idx, plId, normalizedPlaylists[plId].name);
+                  if (clean) normalizedVideos.push(clean);
                 });
               }
             });
           }
         }
 
-        // Caso B: Array de vídeos na raiz ou na propriedade .videos / .items / .filmes
-        const videoArray = Array.isArray(rawJson)
-          ? rawJson
-          : (Array.isArray(rawJson.videos)
-              ? rawJson.videos
-              : (Array.isArray(rawJson.items)
-                  ? rawJson.items
-                  : (Array.isArray(rawJson.filmes) ? rawJson.filmes : null)));
+        // 2. Processa array de vídeos em qualquer chave conhecida ou na raiz
+        const candidateArrays = [
+          Array.isArray(rawJson) ? rawJson : null,
+          Array.isArray(rawJson.videos) ? rawJson.videos : null,
+          Array.isArray(rawJson.items) ? rawJson.items : null,
+          Array.isArray(rawJson.filmes) ? rawJson.filmes : null,
+          Array.isArray(rawJson.movies) ? rawJson.movies : null,
+          Array.isArray(rawJson.catalog) ? rawJson.catalog : null,
+          Array.isArray(rawJson.data) ? rawJson.data : null
+        ].filter(Boolean);
 
-        if (videoArray) {
-          videoArray.forEach((item, idx) => {
-            if (!item) return;
-            const vid = typeof item === 'string'
-              ? extractCleanVideoId(item)
-              : extractCleanVideoId(item.id || item.videoId || item.url || item.link);
-            if (!vid) return;
+        candidateArrays.forEach((arr) => {
+          arr.forEach((item, idx) => {
+            const clean = sanitizeVideoItem(item, idx);
+            if (!clean) return;
 
-            const rawPlName = item.playlistName || item.playlist || item.category || item.categoria || item.collection || null;
-            let plId = item.playlistId || null;
-            let plName = rawPlName;
-
-            if (plId && !plName && normalizedPlaylists[plId]) {
-              plName = normalizedPlaylists[plId].name;
-            } else if (!plId && plName) {
-              plId = slugifyPlaylistName(plName);
+            if (clean.playlistId && normalizedPlaylists[clean.playlistId] && !clean.playlistName) {
+              clean.playlistName = normalizedPlaylists[clean.playlistId].name;
             }
-
-            if (plId && plName && !normalizedPlaylists[plId]) {
-              normalizedPlaylists[plId] = {
-                id: plId,
-                name: plName,
+            if (clean.playlistId && clean.playlistName && !normalizedPlaylists[clean.playlistId]) {
+              normalizedPlaylists[clean.playlistId] = {
+                id: clean.playlistId,
+                name: clean.playlistName,
                 importedAt: Date.now()
               };
             }
-
-            normalizedVideos.push({
-              id: vid,
-              title: item.title || item.nome || `Vídeo (${vid})`,
-              author: item.author || item.canal || 'YouTube',
-              currentTime: Number(item.currentTime) || 0,
-              duration: Number(item.duration) || 0,
-              lastWatched: item.lastWatched || null,
-              completed: Boolean(item.completed),
-              playlistId: plId,
-              playlistName: plName || (plId && normalizedPlaylists[plId] ? normalizedPlaylists[plId].name : null),
-              playlistOrder: typeof item.playlistOrder === 'number' ? item.playlistOrder : idx
-            });
+            normalizedVideos.push(clean);
           });
-        } else if (!rawJson.playlists && !Array.isArray(rawJson)) {
-          // Caso C: Objeto dicionário onde cada chave é o nome da playlist e o valor é um array de vídeos
+        });
+
+        // 3. Caso seja um objeto mapeando categorias/playlists -> arrays de vídeos
+        if (normalizedVideos.length === 0 && !Array.isArray(rawJson)) {
           Object.entries(rawJson).forEach(([groupKey, groupVal]) => {
+            if (['playlists', 'videos', 'app', 'version', 'exportedAt'].includes(groupKey)) return;
             if (!Array.isArray(groupVal)) return;
             const plId = slugifyPlaylistName(groupKey);
             normalizedPlaylists[plId] = {
@@ -1863,22 +2299,8 @@
               importedAt: Date.now()
             };
             groupVal.forEach((item, idx) => {
-              const vid = typeof item === 'string'
-                ? extractCleanVideoId(item)
-                : extractCleanVideoId(item && (item.id || item.videoId || item.url || item.link));
-              if (!vid) return;
-              normalizedVideos.push({
-                id: vid,
-                title: (item && (item.title || item.nome)) || `Vídeo (${vid})`,
-                author: (item && (item.author || item.canal)) || 'YouTube',
-                currentTime: Number(item && item.currentTime) || 0,
-                duration: Number(item && item.duration) || 0,
-                lastWatched: (item && item.lastWatched) || null,
-                completed: Boolean(item && item.completed),
-                playlistId: plId,
-                playlistName: groupKey,
-                playlistOrder: idx
-              });
+              const clean = sanitizeVideoItem(item, idx, plId, groupKey);
+              if (clean) normalizedVideos.push(clean);
             });
           });
         }
@@ -1890,32 +2312,45 @@
         let addedPlaylists = 0;
         let addedVideos = 0;
 
-        Object.entries(parsedData.playlists).forEach(([plId, plMeta]) => {
+        Object.entries(parsedData.playlists || {}).forEach(([plId, plMeta]) => {
           if (!state.playlists[plId]) {
             state.playlists[plId] = plMeta;
             addedPlaylists++;
-          } else if (plMeta.name) {
+          } else if (plMeta && plMeta.name) {
             state.playlists[plId].name = plMeta.name;
           }
         });
 
         const existingMap = new Map(state.videos.map((v) => [v.id, v]));
 
-        parsedData.videos.forEach((incoming) => {
+        (parsedData.videos || []).forEach((incoming) => {
+          if (!incoming || !incoming.id) return;
+          if (incoming.playlistId && incoming.playlistName && !state.playlists[incoming.playlistId]) {
+            state.playlists[incoming.playlistId] = {
+              id: incoming.playlistId,
+              name: incoming.playlistName,
+              importedAt: Date.now()
+            };
+            addedPlaylists++;
+          }
+
           const existing = existingMap.get(incoming.id);
           if (!existing) {
             state.videos.push(incoming);
             existingMap.set(incoming.id, incoming);
             addedVideos++;
           } else {
-            // Preserva progresso salvo do usuário, mas atualiza metadados/playlist se ausentes
             if (!existing.playlistId && incoming.playlistId) {
               existing.playlistId = incoming.playlistId;
               existing.playlistName = incoming.playlistName;
               existing.playlistOrder = incoming.playlistOrder;
             }
+            if (incoming.title && (existing.title.startsWith('Vídeo') || existing.title.startsWith('Filme'))) {
+              existing.title = incoming.title;
+            }
             if (overwriteProgress) {
               existing.currentTime = incoming.currentTime;
+              existing.duration = incoming.duration || existing.duration;
               existing.completed = incoming.completed;
               existing.lastWatched = incoming.lastWatched;
             }
@@ -1936,11 +2371,21 @@
         if (btnSide) btnSide.disabled = true;
 
         try {
-          const response = await fetch(`${GITHUB_SEED_URL}?t=${Date.now()}`, { cache: 'no-store' });
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 7500);
+
+          const response = await fetch(`${GITHUB_SEED_URL}?t=${Date.now()}`, {
+            cache: 'no-store',
+            signal: controller.signal
+          });
+          clearTimeout(timeoutId);
+
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
           }
-          const json = await response.json();
+
+          const rawText = await response.text();
+          const json = JSON.parse(rawText);
           const parsed = parseSeedOrBackupJson(json);
 
           if (parsed.videos.length === 0) {
@@ -1952,21 +2397,22 @@
           renderAll();
 
           if (isFirstRun) {
-            showToast(`Catálogo inicial carregado (${parsed.videos.length} filmes)!`);
+            showToast(`Catálogo inicial carregado com ${parsed.videos.length} título(s)!`);
           } else if (addedVideos > 0 || addedPlaylists > 0) {
-            showToast(`Banco inicial sincronizado: +${addedVideos} filme(s) e +${addedPlaylists} playlist(s).`);
+            showToast(`Catálogo sincronizado: +${addedVideos} vídeo(s) e +${addedPlaylists} playlist(s).`);
           } else {
-            showToast('Seu catálogo já está atualizado com todos os filmes do banco inicial!');
+            showToast('Seu catálogo já possui todos os vídeos do banco inicial!');
           }
         } catch (err) {
-          console.warn('Falha ao carregar banco inicial do GitHub:', err);
-          if (isFirstRun && state.videos.length === 0) {
-            state.videos = JSON.parse(JSON.stringify(OFFLINE_FALLBACK_VIDEOS));
+          console.warn('Aviso ao buscar banco inicial do GitHub:', err);
+          if (state.videos.length === 0) {
+            const fallbackParsed = parseSeedOrBackupJson({ videos: OFFLINE_FALLBACK_VIDEOS });
+            mergeSeedDataIntoState(fallbackParsed, false);
             saveLibrary();
             renderAll();
-            showToast('Modo offline: filmes básicos de demonstração carregados.');
-          } else {
-            showToast('Não foi possível conectar ao GitHub no momento. Tente novamente em instantes.');
+            showToast('Catálogo base carregado. Você já pode adicionar vídeos ou playlists!');
+          } else if (!isFirstRun) {
+            showToast('Não foi possível acessar o GitHub agora. Sua biblioteca local continua salva.');
           }
         } finally {
           isFetchingSeed = false;
@@ -1985,17 +2431,20 @@
             fetchAndApplyGitHubSeed({ isFirstRun: true });
             return;
           }
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) {
-            state = { videos: parsed, playlists: {} };
-          } else {
-            state = {
-              videos: Array.isArray(parsed.videos) ? parsed.videos : [],
-              playlists: parsed.playlists && typeof parsed.playlists === 'object' ? parsed.playlists : {}
-            };
+
+          const parsedRaw = JSON.parse(raw);
+          const normalized = parseSeedOrBackupJson(parsedRaw);
+
+          state = {
+            videos: normalized.videos,
+            playlists: normalized.playlists
+          };
+
+          if (state.videos.length === 0) {
+            fetchAndApplyGitHubSeed({ isFirstRun: true });
           }
         } catch (err) {
-          console.error('Erro ao carregar GlauTube localStorage:', err);
+          console.error('Erro ao ler localStorage, reiniciando com segurança:', err);
           state = { videos: [], playlists: {} };
           fetchAndApplyGitHubSeed({ isFirstRun: true });
         }
@@ -2006,33 +2455,49 @@
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         } catch (err) {
           console.error('Erro ao salvar no localStorage:', err);
-          showToast('Aviso: Espaço de armazenamento local cheio ou bloqueado.');
         }
       }
 
       // ======================================================================
-      // RENDERIZAÇÃO DA SIDEBAR ESQUERDA, CARTÕES E PRATELEIRAS NETFLIX
+      // 5. RENDERIZAÇÃO DA SIDEBAR ESQUERDA, CARTÕES E PRATELEIRAS
       // ======================================================================
+      function updatePlayerMovePlaylistSelect(currentVideo) {
+        if (!selectMovePlaylist) return;
+        selectMovePlaylist.innerHTML = `<option value="">Minha Lista (Sem Playlist)</option>`;
+        Object.values(state.playlists).forEach((pl) => {
+          const opt = document.createElement('option');
+          opt.value = pl.id;
+          opt.textContent = `Playlist: ${pl.name}`;
+          selectMovePlaylist.appendChild(opt);
+        });
+        selectMovePlaylist.value = (currentVideo && currentVideo.playlistId) ? currentVideo.playlistId : '';
+      }
+
       function renderSidebar() {
         const playlistIds = Object.keys(state.playlists);
 
-        // Garante que o filtro ativo ainda exista
         if (activeFilter.startsWith('playlist:')) {
           const plId = activeFilter.replace('playlist:', '');
           if (!state.playlists[plId]) activeFilter = 'all';
         }
 
         const totalVideos = state.videos.length;
+        const continueCount = state.videos.filter((v) => isVideoInProgress(v)).length;
         const standaloneCount = state.videos.filter((v) => !v.playlistId && !isVideoCompleted(v)).length;
         const completedCount = state.videos.filter((v) => isVideoCompleted(v)).length;
 
-        // 1. Navegação Geral
         const navItems = [
           {
             id: 'all',
-            label: 'Todos os Vídeos',
+            label: 'Início (Todos)',
             count: totalVideos,
             icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`
+          },
+          {
+            id: 'continue',
+            label: 'Continuar Assistindo',
+            count: continueCount,
+            icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`
           },
           {
             id: 'watchlist',
@@ -2073,17 +2538,17 @@
           sidebarNavList.appendChild(row);
         });
 
-        // 2. Lista Vertical de Playlists (uma abaixo da outra)
         sidebarPlaylistsTotal.textContent = playlistIds.length;
         sidebarPlaylistsList.innerHTML = '';
 
         if (playlistIds.length === 0) {
-          sidebarPlaylistsList.innerHTML = `<div class="sidebar-empty-hint">Nenhuma playlist ainda. Cole um link com <strong>list=</strong> acima para importar.</div>`;
+          sidebarPlaylistsList.innerHTML = `<div class="sidebar-empty-hint">Nenhuma playlist ainda. Cole um link com <strong>list=</strong> na barra superior para importar.</div>`;
           return;
         }
 
         playlistIds.forEach((plId) => {
           const pl = state.playlists[plId];
+          if (!pl) return;
           const count = state.videos.filter((v) => v.playlistId === plId).length;
           const filterKey = `playlist:${plId}`;
 
@@ -2149,10 +2614,9 @@
         const pct = getProgressPercent(video);
         const completed = isVideoCompleted(video);
         const inProgress = isVideoInProgress(video);
-        const thumbUrl = `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`;
+        const thumbUrl = video.thumb || `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`;
         const fallbackSvg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='270' viewBox='0 0 480 270'%3E%3Crect width='480' height='270' fill='%23181818'/%3E%3Cpolygon points='215,105 280,135 215,165' fill='%23E50914'/%3E%3C/svg%3E`;
 
-        // Miniatura
         const thumbWrap = document.createElement('div');
         thumbWrap.className = 'thumb-wrapper';
         thumbWrap.title = `Reproduzir: ${video.title}`;
@@ -2213,7 +2677,6 @@
           thumbWrap.appendChild(track);
         }
 
-        // Corpo
         const body = document.createElement('div');
         body.className = 'card-body';
 
@@ -2247,7 +2710,6 @@
         }
         infoBlock.appendChild(metaRow);
 
-        // Botões de ação
         const actions = document.createElement('div');
         actions.className = 'card-actions';
 
@@ -2276,7 +2738,6 @@
         }
         actions.appendChild(primaryBtn);
 
-        // Botão Marcar como Concluído (se ainda não concluído)
         if (!completed) {
           const doneBtn = document.createElement('button');
           doneBtn.type = 'button';
@@ -2291,7 +2752,6 @@
           actions.appendChild(doneBtn);
         }
 
-        // Botão Resetar Progresso (se iniciado ou concluído)
         if (inProgress || completed) {
           const resetBtn = document.createElement('button');
           resetBtn.type = 'button';
@@ -2307,7 +2767,6 @@
           actions.appendChild(resetBtn);
         }
 
-        // Botão Remover Vídeo
         const delBtn = document.createElement('button');
         delBtn.type = 'button';
         delBtn.className = 'btn-card-icon danger';
@@ -2331,6 +2790,11 @@
       function renderAll() {
         renderSidebar();
 
+        if (activeVideoId) {
+          const currentActive = state.videos.find((v) => v.id === activeVideoId);
+          updatePlayerMovePlaylistSelect(currentActive);
+        }
+
         // 1. Prateleira "Continuar Assistindo" (sempre no topo)
         let continueVideos = state.videos.filter((v) => isVideoInProgress(v));
         if (activeFilter.startsWith('playlist:')) {
@@ -2339,17 +2803,18 @@
         }
         continueVideos.sort((a, b) => (b.lastWatched || 0) - (a.lastWatched || 0));
 
-        sectionContinue.style.display = (activeFilter === 'completed') ? 'none' : 'flex';
+        const showContinueSection = activeFilter !== 'completed';
+        sectionContinue.style.display = showContinueSection ? 'flex' : 'none';
         countContinue.textContent = continueVideos.length;
         shelfContinue.innerHTML = '';
 
         if (continueVideos.length === 0) {
-          shelfContinue.innerHTML = `<div class="empty-shelf">Nenhum vídeo em andamento no momento. Dê play em qualquer título abaixo e o GlauTube salvará automaticamente onde você parou.</div>`;
+          shelfContinue.innerHTML = `<div class="empty-shelf">Nenhum vídeo em andamento no momento. Clique em qualquer título abaixo para começar a assistir e o GlauTube salvará automaticamente o segundo exato onde você parou.</div>`;
         } else {
           continueVideos.forEach((v) => shelfContinue.appendChild(createVideoCard(v, 'continue')));
         }
 
-        // 2. Prateleiras de Playlists Importadas
+        // 2. Prateleiras de Playlists
         playlistsShelvesContainer.innerHTML = '';
         const playlistIds = Object.keys(state.playlists);
 
@@ -2375,7 +2840,7 @@
             const titleGroup = document.createElement('div');
             titleGroup.className = 'shelf-title-group';
             titleGroup.innerHTML = `
-              <h2 class="shelf-title">Playlist: ${escapeHtml(plMeta.name)}</h2>
+              <h2 class="shelf-title">${escapeHtml(plMeta.name)}</h2>
               <span class="shelf-count">${plVideos.length} vídeos</span>
             `;
 
@@ -2417,7 +2882,7 @@
           }
         }
 
-        // 3. Prateleira "Minha Lista (Para Assistir)" — vídeos individuais não concluídos
+        // 3. Prateleira "Minha Lista (Para Assistir)"
         const showWatchlist = activeFilter === 'all' || activeFilter === 'watchlist';
         sectionWatchlist.style.display = showWatchlist ? 'flex' : 'none';
 
@@ -2427,7 +2892,7 @@
           shelfWatchlist.innerHTML = '';
 
           if (standaloneVideos.length === 0) {
-            shelfWatchlist.innerHTML = `<div class="empty-shelf">Nenhum vídeo individual aguardando na Minha Lista. Cole um link do YouTube acima para adicionar.</div>`;
+            shelfWatchlist.innerHTML = `<div class="empty-shelf">Nenhum vídeo avulso na Minha Lista. Cole um link do YouTube na barra superior para adicionar.</div>`;
           } else {
             standaloneVideos.forEach((v) => shelfWatchlist.appendChild(createVideoCard(v, 'watchlist')));
           }
@@ -2454,7 +2919,7 @@
       }
 
       // ======================================================================
-      // YOUTUBE IFRAME PLAYER API & SALVAMENTO AUTOMÁTICO A CADA 2 SEGUNDOS
+      // 6. YOUTUBE IFRAME PLAYER API & SALVAMENTO AUTOMÁTICO A CADA 2 SEGUNDOS
       // ======================================================================
       function injectYouTubeApiScript() {
         if (window.YT && window.YT.Player) {
@@ -2464,7 +2929,11 @@
         const tag = document.createElement('script');
         tag.src = 'https://www.youtube.com/iframe_api';
         const firstScript = document.getElementsByTagName('script')[0];
-        firstScript.parentNode.insertBefore(tag, firstScript);
+        if (firstScript && firstScript.parentNode) {
+          firstScript.parentNode.insertBefore(tag, firstScript);
+        } else {
+          document.head.appendChild(tag);
+        }
       }
 
       window.onYouTubeIframeAPIReady = function () {
@@ -2480,7 +2949,6 @@
         const current = state.videos.find((v) => v.id === currentId);
         if (!current) return null;
 
-        // Se pertence a uma playlist, busca o próximo da mesma playlist
         if (current.playlistId) {
           const plVideos = state.videos
             .filter((v) => v.playlistId === current.playlistId)
@@ -2492,7 +2960,6 @@
           }
         }
 
-        // Caso contrário, busca o próximo vídeo não concluído na biblioteca
         const candidates = state.videos.filter((v) => v.id !== currentId && !isVideoCompleted(v));
         return candidates.length > 0 ? candidates[0] : null;
       }
@@ -2504,7 +2971,6 @@
 
         if (plVideos.length === 0) return;
 
-        // Prioriza o último em andamento da playlist ou o primeiro não concluído
         const inProg = plVideos
           .filter((v) => isVideoInProgress(v))
           .sort((a, b) => (b.lastWatched || 0) - (a.lastWatched || 0))[0];
@@ -2533,6 +2999,8 @@
         } else {
           cinemaPlaylistTag.classList.remove('visible');
         }
+
+        updatePlayerMovePlaylistSelect(video);
 
         const nextVid = getNextVideoInQueue(video.id);
         btnNextInQueue.disabled = !nextVid;
@@ -2585,7 +3053,7 @@
             onStateChange: handlePlayerStateChange,
             onError: () => {
               cinemaStatusLabel.textContent = 'Vídeo indisponível para incorporação';
-              showToast('Este vídeo bloqueia reprodução incorporada pelo autor.');
+              showToast('Este vídeo possui restrição de incorporação definida pelo canal no YouTube.');
             }
           }
         });
@@ -2676,16 +3144,14 @@
           if (forceRender) {
             renderAll();
           }
-        } catch (e) {
-          // Falha silenciosa durante transição do iframe
-        }
+        } catch (e) {}
       }
 
       function closeCinemaPlayer() {
         syncPlaybackProgress(false);
         stopAutoSaveLoop();
         if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
-          ytPlayer.pauseVideo();
+          try { ytPlayer.pauseVideo(); } catch (e) {}
         }
         activeVideoId = null;
         cinemaSection.classList.remove('active');
@@ -2693,7 +3159,7 @@
       }
 
       // ======================================================================
-      // OPERAÇÕES DE CARTÕES, PLAYLISTS E BACKUP JSON
+      // 7. OPERAÇÕES DE CARTÕES, PLAYLISTS E BACKUP JSON
       // ======================================================================
       function restartVideo(videoId, autoPlay) {
         const video = state.videos.find((v) => v.id === videoId);
@@ -2791,29 +3257,6 @@
         });
       }
 
-      function clearDemoVideos() {
-        const demos = state.videos.filter((v) => v.isDemo);
-        if (demos.length === 0) return;
-
-        state.videos = state.videos.filter((v) => !v.isDemo);
-        if (activeVideoId && demos.some((v) => v.id === activeVideoId)) {
-          closeCinemaPlayer();
-        }
-
-        undoBuffer = { type: 'demos', videos: demos };
-        saveLibrary();
-        renderAll();
-
-        showToast('Vídeos de exemplo removidos.', 'Desfazer', () => {
-          if (undoBuffer && undoBuffer.type === 'demos') {
-            state.videos.push(...undoBuffer.videos);
-            undoBuffer = null;
-            saveLibrary();
-            renderAll();
-          }
-        });
-      }
-
       function exportLibraryJson() {
         syncPlaybackProgress(false);
         const payload = {
@@ -2862,7 +3305,7 @@
       }
 
       // ======================================================================
-      // NOTIFICAÇÕES TOAST
+      // 8. NOTIFICAÇÕES TOAST
       // ======================================================================
       function showToast(message, actionLabel = null, actionCallback = null) {
         const container = document.getElementById('toast-container');
@@ -2897,7 +3340,7 @@
       }
 
       // ======================================================================
-      // EVENT LISTENERS
+      // 9. EVENT LISTENERS
       // ======================================================================
       urlInput.addEventListener('input', updateInputDetectionUI);
 
@@ -2983,6 +3426,28 @@
         }
       });
 
+      selectMovePlaylist.addEventListener('change', (e) => {
+        if (!activeVideoId) return;
+        const video = state.videos.find((v) => v.id === activeVideoId);
+        if (!video) return;
+
+        const targetPlId = e.target.value || null;
+        if (!targetPlId) {
+          video.playlistId = null;
+          video.playlistName = null;
+          cinemaPlaylistTag.classList.remove('visible');
+          showToast('Vídeo movido para a Minha Lista (sem playlist).');
+        } else if (state.playlists[targetPlId]) {
+          video.playlistId = targetPlId;
+          video.playlistName = state.playlists[targetPlId].name;
+          cinemaPlaylistTag.textContent = `Playlist: ${video.playlistName}`;
+          cinemaPlaylistTag.classList.add('visible');
+          showToast(`Vídeo movido para a playlist "${video.playlistName}".`);
+        }
+        saveLibrary();
+        renderAll();
+      });
+
       document.getElementById('btn-mobile-sidebar').addEventListener('click', openMobileSidebar);
       document.getElementById('btn-close-mobile-sidebar').addEventListener('click', closeMobileSidebar);
       sidebarBackdrop.addEventListener('click', closeMobileSidebar);
@@ -2991,7 +3456,7 @@
         closeMobileSidebar();
         urlInput.focus();
         urlInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        showToast('Cole o link de uma playlist do YouTube na barra superior para importá-la.');
+        showToast('Cole o link de um vídeo ou playlist do YouTube na barra superior.');
       });
 
       document.getElementById('btn-sidebar-restore-seed').addEventListener('click', () => {
@@ -3004,10 +3469,12 @@
       });
 
       document.getElementById('btn-export-json').addEventListener('click', exportLibraryJson);
+      document.getElementById('btn-sidebar-export').addEventListener('click', exportLibraryJson);
+
       document.getElementById('btn-import-json').addEventListener('click', () => importFileInput.click());
+      document.getElementById('btn-sidebar-import').addEventListener('click', () => importFileInput.click());
       importFileInput.addEventListener('change', (e) => importLibraryJson(e.target.files[0]));
 
-      // Garante salvamento imediato ao ocultar aba, trocar app no celular ou fechar navegador
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'hidden') {
           syncPlaybackProgress(false);
@@ -3019,7 +3486,7 @@
       });
 
       // ======================================================================
-      // INICIALIZAÇÃO DO GLAUTUBE
+      // 10. INICIALIZAÇÃO DO GLAUTUBE
       // ======================================================================
       loadLibrary();
       renderAll();
