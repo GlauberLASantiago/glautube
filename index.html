@@ -3,31 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Meu Stream — Controlador Pessoal do YouTube</title>
-  <!-- Favicon SVG embutido via Data URI -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23141414'/%3E%3Cpath d='M18 14L50 32L18 50V14Z' fill='%23E50914'/%3E%3Crect x='14' y='52' width='36' height='4' rx='2' fill='%23E50914'/%3E%3C/svg%3E" />
+  <title>GlauTube — Seu Streaming Pessoal</title>
+  <!-- Favicon SVG personalizado do GlauTube (botão play vermelho estilizado) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23ff1e27'/%3E%3Cstop offset='100%25' stop-color='%23b80710'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='%23141414'/%3E%3Crect x='3' y='3' width='58' height='58' rx='12' fill='none' stroke='%23E50914' stroke-width='2.5' stroke-opacity='0.45'/%3E%3Cpath d='M22 16L48 32L22 48V16Z' fill='url(%23g)'/%3E%3Crect x='16' y='52' width='32' height='3.5' rx='1.75' fill='%23E50914'/%3E%3C/svg%3E" />
 
   <style>
     /* ==========================================================================
-       DESIGN TOKENS & RESET (TEMA DARK ESTILO NETFLIX)
+       1. DESIGN TOKENS & BASE (TEMA ESCURO ESTILO NETFLIX)
        ========================================================================== */
     :root {
       --bg-primary: #141414;
-      --bg-secondary: #181818;
-      --bg-card: #1f1f1f;
-      --bg-card-hover: #2a2a2a;
-      --bg-header: rgba(20, 20, 20, 0.94);
+      --bg-elevated: #181818;
+      --bg-card: #181818;
+      --bg-card-hover: #242424;
+      --bg-header: rgba(20, 20, 20, 0.95);
       --accent-red: #E50914;
-      --accent-red-hover: #f40612;
+      --accent-red-hover: #f6121d;
+      --accent-red-soft: rgba(229, 9, 20, 0.16);
       --text-primary: #ffffff;
       --text-secondary: #b3b3b3;
-      --text-muted: #757575;
-      --border-subtle: rgba(255, 255, 255, 0.12);
-      --shadow-card: 0 10px 25px rgba(0, 0, 0, 0.65);
+      --text-muted: #777777;
+      --border-subtle: rgba(255, 255, 255, 0.11);
+      --border-strong: rgba(255, 255, 255, 0.24);
+      --shadow-card: 0 12px 28px rgba(0, 0, 0, 0.72);
       --radius-sm: 6px;
       --radius-md: 10px;
       --radius-lg: 14px;
-      --transition-fast: 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+      --transition: 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
 
     * {
@@ -46,9 +48,10 @@
 
     body {
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
       background-color: var(--bg-primary);
       overflow-x: hidden;
-      padding-bottom: 4rem;
     }
 
     button, input {
@@ -63,82 +66,116 @@
     }
 
     /* ==========================================================================
-       CABEÇALHO FIXO & BARRA DE ADIÇÃO RÁPIDA
+       2. CABEÇALHO FIXO & IMPORTAÇÃO UNIFICADA (VÍDEO + PLAYLIST)
        ========================================================================== */
     .app-header {
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 120;
       background: var(--bg-header);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border-subtle);
       padding: 0.85rem 4%;
     }
 
-    .header-container {
-      max-width: 1440px;
+    .header-inner {
+      max-width: 1480px;
       margin: 0 auto;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 0.9rem;
+      gap: 0.85rem;
     }
 
+    /* Marca GlauTube estilo Netflix */
     .brand {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 0.65rem;
       text-decoration: none;
       user-select: none;
-    }
-
-    .brand-logo {
-      width: 34px;
-      height: 34px;
       flex-shrink: 0;
     }
 
-    .brand-text {
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+    }
+
+    .brand-wordmark {
       display: flex;
       flex-direction: column;
     }
 
-    .brand-title {
-      font-size: 1.25rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      color: var(--text-primary);
-      line-height: 1.1;
+    .brand-name {
+      font-size: 1.42rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      text-transform: uppercase;
     }
 
-    .brand-title span {
+    .brand-name .glau {
+      color: var(--text-primary);
+    }
+
+    .brand-name .tube {
       color: var(--accent-red);
     }
 
-    .brand-subtitle {
-      font-size: 0.72rem;
+    .brand-tagline {
+      font-size: 0.7rem;
       color: var(--text-secondary);
-      letter-spacing: 0.02em;
+      letter-spacing: 0.04em;
+      margin-top: 2px;
     }
 
-    /* Barra de Entrada de Link */
+    /* Formulário Unificado de Link (Vídeo ou Playlist) */
+    .import-zone {
+      flex: 1 1 460px;
+      max-width: 720px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
     .add-bar {
-      flex: 1 1 420px;
-      max-width: 660px;
       display: flex;
       align-items: center;
       background: rgba(255, 255, 255, 0.07);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-md);
-      padding: 0.3rem;
-      transition: border-color var(--transition-fast), background var(--transition-fast);
+      padding: 0.28rem;
+      transition: border-color var(--transition), background var(--transition);
     }
 
     .add-bar:focus-within {
       border-color: var(--accent-red);
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.11);
+    }
+
+    .type-pill {
+      display: none;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.28rem 0.55rem;
+      margin-left: 0.3rem;
+      border-radius: 5px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: var(--accent-red-soft);
+      color: #ff6b72;
+      border: 1px solid rgba(229, 9, 20, 0.35);
+      white-space: nowrap;
+    }
+
+    .type-pill.visible {
+      display: inline-flex;
     }
 
     .add-input {
@@ -148,7 +185,7 @@
       border: none;
       outline: none;
       padding: 0.55rem 0.75rem;
-      font-size: 0.92rem;
+      font-size: 0.91rem;
       color: var(--text-primary);
     }
 
@@ -156,21 +193,21 @@
       color: var(--text-muted);
     }
 
-    .btn-icon-inline {
+    .btn-inline {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.4rem;
-      padding: 0.52rem 0.75rem;
+      gap: 0.38rem;
+      padding: 0.52rem 0.72rem;
       border-radius: var(--radius-sm);
-      font-size: 0.84rem;
+      font-size: 0.83rem;
       font-weight: 600;
       color: var(--text-secondary);
-      transition: all var(--transition-fast);
+      transition: all var(--transition);
       white-space: nowrap;
     }
 
-    .btn-icon-inline:hover {
+    .btn-inline:hover {
       background: rgba(255, 255, 255, 0.12);
       color: var(--text-primary);
     }
@@ -179,76 +216,160 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.4rem;
+      gap: 0.42rem;
       background: var(--accent-red);
       color: #fff;
       font-weight: 700;
-      font-size: 0.86rem;
+      font-size: 0.85rem;
       padding: 0.58rem 1rem;
       border-radius: var(--radius-sm);
-      transition: background var(--transition-fast), transform 0.1s ease;
+      transition: background var(--transition), transform 0.1s ease;
       white-space: nowrap;
     }
 
-    .btn-primary:hover {
+    .btn-primary:hover:not(:disabled) {
       background: var(--accent-red-hover);
     }
 
-    .btn-primary:active {
+    .btn-primary:active:not(:disabled) {
       transform: scale(0.98);
     }
 
-    /* Ações de Backup JSON */
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Campo Opcional de Nome da Playlist (aparece ao detectar list=) */
+    .playlist-name-row {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(229, 9, 20, 0.08);
+      border: 1px solid rgba(229, 9, 20, 0.28);
+      border-radius: var(--radius-sm);
+      padding: 0.35rem 0.65rem;
+      animation: fadeSlide 0.2s ease;
+    }
+
+    .playlist-name-row.visible {
+      display: flex;
+    }
+
+    .playlist-name-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #ff8a90;
+      white-space: nowrap;
+    }
+
+    .playlist-name-input {
+      flex: 1;
+      min-width: 0;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 0.32rem 0.55rem;
+      font-size: 0.82rem;
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    .playlist-name-input:focus {
+      border-color: var(--accent-red);
+    }
+
+    /* Barra de Progresso de Importação de Playlist */
+    .import-progress-box {
+      display: none;
+      flex-direction: column;
+      gap: 0.35rem;
+      background: #1d1d1d;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      padding: 0.55rem 0.75rem;
+    }
+
+    .import-progress-box.visible {
+      display: flex;
+    }
+
+    .import-progress-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .import-bar-track {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .import-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent-red);
+      transition: width 0.25s ease;
+    }
+
+    /* Ações de Cabeçalho (Backup JSON) */
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.45rem;
     }
 
     .btn-ghost {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      padding: 0.52rem 0.8rem;
+      gap: 0.38rem;
+      padding: 0.52rem 0.78rem;
       border-radius: var(--radius-sm);
       border: 1px solid var(--border-subtle);
       background: rgba(255, 255, 255, 0.04);
       font-size: 0.82rem;
       font-weight: 600;
       color: var(--text-secondary);
-      transition: all var(--transition-fast);
+      transition: all var(--transition);
+      white-space: nowrap;
     }
 
     .btn-ghost:hover {
       background: rgba(255, 255, 255, 0.12);
       color: var(--text-primary);
-      border-color: rgba(255, 255, 255, 0.25);
+      border-color: var(--border-strong);
+    }
+
+    .btn-ghost.danger:hover {
+      background: rgba(229, 9, 20, 0.18);
+      border-color: rgba(229, 9, 20, 0.45);
+      color: #ff7b82;
     }
 
     /* ==========================================================================
-       PLAYER DE CINEMA EM DESTAQUE
+       3. PLAYER DE CINEMA INTEGRADO
        ========================================================================== */
     .cinema-section {
       display: none;
-      background: radial-gradient(circle at top, #221012 0%, #141414 72%);
+      background: radial-gradient(circle at top center, #251012 0%, #141414 74%);
       border-bottom: 1px solid var(--border-subtle);
-      padding: 1.5rem 4% 2rem;
-      animation: fadeSlideDown 0.3s ease;
+      padding: 1.4rem 4% 1.9rem;
+      animation: fadeSlide 0.28s ease;
     }
 
     .cinema-section.active {
       display: block;
     }
 
-    @keyframes fadeSlideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-12px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .cinema-wrapper {
@@ -262,23 +383,30 @@
       align-items: center;
       justify-content: space-between;
       gap: 0.75rem;
-      margin-bottom: 0.9rem;
+      margin-bottom: 0.85rem;
     }
 
     .cinema-meta {
+      flex: 1;
+      min-width: 0;
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
-      min-width: 0;
-      flex: 1;
     }
 
-    .cinema-badge {
+    .cinema-badges {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .cinema-live-badge {
       display: inline-flex;
       align-items: center;
-      gap: 0.45rem;
-      font-size: 0.75rem;
-      font-weight: 700;
+      gap: 0.42rem;
+      font-size: 0.74rem;
+      font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--accent-red);
@@ -289,18 +417,31 @@
       height: 8px;
       border-radius: 50%;
       background: var(--accent-red);
-      box-shadow: 0 0 0 0 rgba(229, 9, 20, 0.7);
       animation: pulse 1.8s infinite;
     }
 
     @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(229, 9, 20, 0.7); }
+      0% { box-shadow: 0 0 0 0 rgba(229, 9, 20, 0.75); }
       70% { box-shadow: 0 0 0 8px rgba(229, 9, 20, 0); }
       100% { box-shadow: 0 0 0 0 rgba(229, 9, 20, 0); }
     }
 
+    .cinema-playlist-tag {
+      display: none;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.16rem 0.55rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-secondary);
+    }
+
+    .cinema-playlist-tag.visible {
+      display: inline-block;
+    }
+
     .cinema-title {
-      font-size: clamp(1.05rem, 2.2vw, 1.4rem);
+      font-size: clamp(1.05rem, 2.1vw, 1.38rem);
       font-weight: 700;
       color: var(--text-primary);
       white-space: nowrap;
@@ -311,11 +452,11 @@
     .player-aspect-box {
       position: relative;
       width: 100%;
-      padding-top: 56.25%; /* Proporção 16:9 */
+      padding-top: 56.25%;
       background: #000;
       border-radius: var(--radius-lg);
       overflow: hidden;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+      box-shadow: 0 22px 52px rgba(0, 0, 0, 0.88);
       border: 1px solid rgba(255, 255, 255, 0.14);
     }
 
@@ -329,7 +470,7 @@
     }
 
     .cinema-controls {
-      margin-top: 1rem;
+      margin-top: 0.95rem;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -345,74 +486,170 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.45rem;
     }
 
     .btn-control {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      padding: 0.5rem 0.85rem;
+      gap: 0.38rem;
+      padding: 0.5rem 0.82rem;
       border-radius: var(--radius-sm);
       background: rgba(255, 255, 255, 0.08);
       color: var(--text-primary);
-      font-size: 0.84rem;
+      font-size: 0.83rem;
       font-weight: 600;
-      transition: all var(--transition-fast);
+      transition: all var(--transition);
     }
 
-    .btn-control:hover {
-      background: rgba(255, 255, 255, 0.16);
+    .btn-control:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.17);
+    }
+
+    .btn-control:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-control.accent {
+      background: var(--accent-red);
+      color: #fff;
+    }
+
+    .btn-control.accent:hover:not(:disabled) {
+      background: var(--accent-red-hover);
     }
 
     .btn-control.success:hover {
-      background: rgba(46, 204, 113, 0.2);
-      color: #6ee7b7;
+      background: rgba(34, 197, 94, 0.22);
+      color: #86efac;
     }
 
     .sync-status {
-      font-size: 0.8rem;
+      font-size: 0.79rem;
       color: var(--text-secondary);
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 0.4rem;
     }
 
     /* ==========================================================================
-       CONTEÚDO PRINCIPAL & PRATELEIRAS ESTILO NETFLIX
+       4. BARRA DE FILTROS / COLEÇÕES & PRATELEIRAS NETFLIX
        ========================================================================== */
-    .main-content {
-      max-width: 1440px;
+    .main-container {
+      flex: 1;
+      max-width: 1480px;
+      width: 100%;
       margin: 0 auto;
-      padding: 1.75rem 4% 0;
+      padding: 1.5rem 4% 3rem;
       display: flex;
       flex-direction: column;
-      gap: 2.6rem;
+      gap: 2.3rem;
+    }
+
+    /* Faixa de Abas / Filtros Rápidos */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .filter-pills {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      overflow-x: auto;
+      max-width: 100%;
+      padding-bottom: 2px;
+      scrollbar-width: thin;
+    }
+
+    .filter-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 0.83rem;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: all var(--transition);
+    }
+
+    .filter-pill:hover {
+      background: rgba(255, 255, 255, 0.13);
+      color: var(--text-primary);
+    }
+
+    .filter-pill.active {
+      background: var(--accent-red);
+      border-color: var(--accent-red);
+      color: #fff;
+    }
+
+    .filter-pill .pill-badge {
+      font-size: 0.72rem;
+      padding: 0.08rem 0.42rem;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.32);
+    }
+
+    .demo-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .demo-banner.visible {
+      display: flex;
+    }
+
+    /* Prateleira */
+    .shelf-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.95rem;
     }
 
     .shelf-header {
       display: flex;
-      align-items: baseline;
+      flex-wrap: wrap;
+      align-items: center;
       justify-content: space-between;
-      gap: 1rem;
-      margin-bottom: 1rem;
+      gap: 0.75rem;
     }
 
-    .shelf-title-wrap {
+    .shelf-title-group {
       display: flex;
       align-items: center;
       gap: 0.65rem;
+      flex-wrap: wrap;
     }
 
     .shelf-title {
-      font-size: 1.32rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: -0.015em;
       color: var(--text-primary);
     }
 
     .shelf-count {
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       font-weight: 700;
       padding: 0.18rem 0.55rem;
       border-radius: 999px;
@@ -420,16 +657,22 @@
       color: var(--text-secondary);
     }
 
+    .shelf-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
     .shelf-hint {
       font-size: 0.8rem;
       color: var(--text-muted);
     }
 
-    /* Grade Responsiva de Cartões */
+    /* Grade de Cartões */
     .cards-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
-      gap: 1.25rem;
+      grid-template-columns: repeat(auto-fill, minmax(272px, 1fr));
+      gap: 1.2rem;
     }
 
     .video-card {
@@ -437,16 +680,16 @@
       background: var(--bg-card);
       border-radius: var(--radius-md);
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.07);
       display: flex;
       flex-direction: column;
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition), background var(--transition);
     }
 
     .video-card:hover {
       transform: translateY(-4px);
       background: var(--bg-card-hover);
-      border-color: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.2);
       box-shadow: var(--shadow-card);
     }
 
@@ -455,12 +698,12 @@
       box-shadow: 0 0 0 1px var(--accent-red), var(--shadow-card);
     }
 
-    /* Thumbnail + Overlay de Play + Barra Vermelha */
+    /* Thumbnail & Barra de Progresso */
     .thumb-wrapper {
       position: relative;
       width: 100%;
       padding-top: 56.25%;
-      background: #0d0d0d;
+      background: #0c0c0c;
       overflow: hidden;
       cursor: pointer;
     }
@@ -485,25 +728,23 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.15) 50%, rgba(0, 0, 0, 0.25) 100%);
-      opacity: 0.92;
-      transition: opacity var(--transition-fast);
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.12) 55%, rgba(0, 0, 0, 0.25) 100%);
     }
 
     .play-circle {
-      width: 54px;
-      height: 54px;
+      width: 52px;
+      height: 52px;
       border-radius: 50%;
-      background: rgba(20, 20, 20, 0.82);
+      background: rgba(20, 20, 20, 0.84);
       border: 2px solid #fff;
       color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
-      transform: scale(0.92);
       opacity: 0;
-      transition: all var(--transition-fast);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+      transform: scale(0.9);
+      transition: all var(--transition);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.65);
     }
 
     .video-card:hover .play-circle,
@@ -518,45 +759,60 @@
       transform: scale(1.08) !important;
     }
 
-    /* Em telas de toque, exibe o botão sutilmente */
     @media (hover: none) {
       .play-circle {
         opacity: 0.92;
         transform: scale(0.95);
-        width: 46px;
-        height: 46px;
+        width: 44px;
+        height: 44px;
       }
     }
 
-    .badge-now-playing {
+    .badge-top-left {
       position: absolute;
-      top: 0.6rem;
-      left: 0.6rem;
+      top: 0.55rem;
+      left: 0.55rem;
       background: var(--accent-red);
       color: #fff;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 800;
       letter-spacing: 0.04em;
-      padding: 0.22rem 0.55rem;
+      padding: 0.2rem 0.52rem;
       border-radius: 4px;
       text-transform: uppercase;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
+    }
+
+    .badge-playlist-chip {
+      position: absolute;
+      top: 0.55rem;
+      right: 0.55rem;
+      max-width: 62%;
+      background: rgba(18, 18, 18, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #e5e5e5;
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 0.18rem 0.48rem;
+      border-radius: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .badge-duration {
       position: absolute;
-      bottom: 0.65rem;
-      right: 0.6rem;
-      background: rgba(0, 0, 0, 0.85);
+      bottom: 0.6rem;
+      right: 0.55rem;
+      background: rgba(0, 0, 0, 0.86);
       color: #fff;
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       font-weight: 600;
-      padding: 0.18rem 0.45rem;
+      padding: 0.16rem 0.44rem;
       border-radius: 4px;
       font-variant-numeric: tabular-nums;
     }
 
-    /* Barra de Progresso estilo Netflix na base da miniatura */
     .progress-track {
       position: absolute;
       bottom: 0;
@@ -570,24 +826,23 @@
     .progress-fill {
       height: 100%;
       background: var(--accent-red);
-      border-radius: 0 2px 2px 0;
       transition: width 0.3s ease;
     }
 
     /* Corpo do Cartão */
     .card-body {
-      padding: 0.9rem 1rem 0.95rem;
+      padding: 0.88rem 0.95rem 0.92rem;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       flex: 1;
-      gap: 0.75rem;
+      gap: 0.72rem;
     }
 
     .card-title {
-      font-size: 0.96rem;
+      font-size: 0.95rem;
       font-weight: 600;
-      line-height: 1.38;
+      line-height: 1.36;
       color: var(--text-primary);
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -597,8 +852,16 @@
     }
 
     .card-title:hover {
-      color: #fff;
       text-decoration: underline;
+    }
+
+    .card-author {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .card-meta-row {
@@ -606,22 +869,22 @@
       align-items: center;
       justify-content: space-between;
       gap: 0.5rem;
-      font-size: 0.78rem;
+      font-size: 0.77rem;
       color: var(--text-secondary);
+      margin-top: 0.42rem;
       font-variant-numeric: tabular-nums;
     }
 
     .remaining-pill {
-      color: #e5e5e5;
+      color: #f3f4f6;
       font-weight: 600;
     }
 
     .card-actions {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 0.45rem;
-      padding-top: 0.55rem;
+      gap: 0.42rem;
+      padding-top: 0.52rem;
       border-top: 1px solid rgba(255, 255, 255, 0.07);
     }
 
@@ -630,14 +893,14 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.38rem;
-      padding: 0.46rem 0.7rem;
+      gap: 0.36rem;
+      padding: 0.46rem 0.65rem;
       border-radius: var(--radius-sm);
       background: rgba(255, 255, 255, 0.1);
       color: #fff;
       font-size: 0.8rem;
       font-weight: 600;
-      transition: background var(--transition-fast);
+      transition: background var(--transition);
     }
 
     .btn-card-primary:hover {
@@ -653,33 +916,52 @@
       justify-content: center;
       color: var(--text-secondary);
       background: rgba(255, 255, 255, 0.05);
-      transition: all var(--transition-fast);
+      transition: all var(--transition);
+      flex-shrink: 0;
     }
 
     .btn-card-icon:hover {
-      background: rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.15);
       color: #fff;
+    }
+
+    .btn-card-icon.success:hover {
+      background: rgba(34, 197, 94, 0.22);
+      color: #86efac;
     }
 
     .btn-card-icon.danger:hover {
       background: rgba(229, 9, 20, 0.22);
-      color: #ff6b6b;
+      color: #ff6b72;
     }
 
-    /* Estado Vazio */
     .empty-shelf {
-      background: rgba(255, 255, 255, 0.03);
+      grid-column: 1 / -1;
+      background: rgba(255, 255, 255, 0.025);
       border: 1px dashed rgba(255, 255, 255, 0.14);
       border-radius: var(--radius-md);
-      padding: 2rem 1.25rem;
+      padding: 1.85rem 1.25rem;
       text-align: center;
       color: var(--text-secondary);
       font-size: 0.9rem;
     }
 
     /* ==========================================================================
-       NOTIFICAÇÕES TOAST (SEM ALERT/CONFIRM NATIVO)
+       5. RODAPÉ & NOTIFICAÇÕES TOAST
        ========================================================================== */
+    .app-footer {
+      border-top: 1px solid var(--border-subtle);
+      background: #101010;
+      padding: 1.35rem 4%;
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .app-footer strong {
+      color: var(--text-secondary);
+    }
+
     .toast-container {
       position: fixed;
       bottom: 1.25rem;
@@ -687,32 +969,32 @@
       z-index: 999;
       display: flex;
       flex-direction: column;
-      gap: 0.6rem;
-      max-width: min(92vw, 390px);
+      gap: 0.55rem;
+      max-width: min(92vw, 410px);
     }
 
     .toast {
-      background: #232323;
+      background: #222222;
       color: #fff;
       border-left: 4px solid var(--accent-red);
       border-radius: var(--radius-sm);
-      padding: 0.8rem 1rem;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.75);
+      padding: 0.78rem 0.95rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.78);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 0.8rem;
-      font-size: 0.86rem;
+      gap: 0.75rem;
+      font-size: 0.85rem;
       line-height: 1.35;
-      animation: toastIn 0.25s ease;
+      animation: toastIn 0.22s ease;
     }
 
     .toast-action {
-      background: rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.15);
       color: #fff;
       font-weight: 700;
-      font-size: 0.78rem;
-      padding: 0.35rem 0.65rem;
+      font-size: 0.77rem;
+      padding: 0.34rem 0.65rem;
       border-radius: 4px;
       white-space: nowrap;
     }
@@ -726,14 +1008,22 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    /* Container Oculto para Extração de Playlist via YouTube IFrame API */
+    #hidden-playlist-extractor {
+      position: fixed;
+      left: -9999px;
+      top: -9999px;
+      width: 220px;
+      height: 220px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
     /* ==========================================================================
-       RESPONSIVIDADE MOBILE
+       6. RESPONSIVIDADE MOBILE
        ========================================================================== */
-    @media (max-width: 768px) {
-      .header-container {
-        gap: 0.7rem;
-      }
-      .add-bar {
+    @media (max-width: 820px) {
+      .import-zone {
         order: 3;
         flex: 1 1 100%;
       }
@@ -742,7 +1032,7 @@
       }
       .cards-grid {
         grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
-        gap: 1rem;
+        gap: 0.95rem;
       }
       .cinema-controls {
         flex-direction: column;
@@ -759,56 +1049,87 @@
 </head>
 <body>
   <!-- ========================================================================
-       CABEÇALHO FIXO
+       CABEÇALHO FIXO GLAUTUBE
        ======================================================================== -->
   <header class="app-header">
-    <div class="header-container">
-      <a href="#top" class="brand" aria-label="Meu Stream Início">
-        <svg class="brand-logo" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="64" height="64" rx="14" fill="#E50914" />
-          <path d="M23 18L47 32L23 46V18Z" fill="#FFFFFF" />
-          <rect x="16" y="51" width="32" height="4" rx="2" fill="rgba(255,255,255,0.85)" />
+    <div class="header-inner">
+      <a href="#top" class="brand" aria-label="GlauTube Início">
+        <svg class="brand-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="glauGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#ff1f29" />
+              <stop offset="100%" stop-color="#b80710" />
+            </linearGradient>
+          </defs>
+          <rect width="64" height="64" rx="15" fill="url(#glauGrad)" />
+          <path d="M23 17L48 32L23 47V17Z" fill="#FFFFFF" />
+          <rect x="16" y="51.5" width="32" height="3.5" rx="1.75" fill="rgba(255,255,255,0.88)" />
         </svg>
-        <div class="brand-text">
-          <span class="brand-title">MEU <span>STREAM</span></span>
-          <span class="brand-subtitle">Controlador Pessoal do YouTube</span>
+        <div class="brand-wordmark">
+          <span class="brand-name"><span class="glau">GLAU</span><span class="tube">TUBE</span></span>
+          <span class="brand-tagline">Seu Streaming Pessoal</span>
         </div>
       </a>
 
-      <!-- Barra Rápida para Colar Link do YouTube -->
-      <form id="add-video-form" class="add-bar" autocomplete="off">
-        <input
-          type="text"
-          id="youtube-url-input"
-          class="add-input"
-          placeholder="Cole um link do YouTube (watch, youtu.be, shorts ou ID)..."
-          aria-label="Link ou ID do vídeo do YouTube"
-        />
-        <button type="button" id="btn-paste-clipboard" class="btn-icon-inline" title="Colar link da área de transferência">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-          </svg>
-          <span class="btn-label-desktop">Colar</span>
-        </button>
-        <button type="submit" class="btn-primary" title="Adicionar à Minha Lista">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          <span>Adicionar</span>
-        </button>
-      </form>
+      <!-- Zona Unificada de Importação (Vídeo Individual ou Playlist Completa) -->
+      <div class="import-zone">
+        <form id="import-form" class="add-bar" autocomplete="off">
+          <span id="detected-type-pill" class="type-pill">Playlist</span>
+          <input
+            type="text"
+            id="youtube-url-input"
+            class="add-input"
+            placeholder="Cole link de vídeo ou playlist do YouTube (watch, youtu.be, playlist?list=...)..."
+            aria-label="Link de vídeo ou playlist do YouTube"
+          />
+          <button type="button" id="btn-paste-clipboard" class="btn-inline" title="Colar da área de transferência">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span class="btn-label-desktop">Colar</span>
+          </button>
+          <button type="submit" id="btn-submit-import" class="btn-primary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span id="btn-submit-label">Adicionar</span>
+          </button>
+        </form>
+
+        <!-- Nome Opcional da Playlist (exibido automaticamente quando list= é detectado) -->
+        <div id="playlist-name-row" class="playlist-name-row">
+          <span class="playlist-name-label">Playlist detectada:</span>
+          <input
+            type="text"
+            id="playlist-custom-name"
+            class="playlist-name-input"
+            placeholder="Nome opcional da coleção (ex: Curso Python, Filmes Sci-Fi)..."
+          />
+        </div>
+
+        <!-- Feedback Visual de Progresso ao Importar Playlist -->
+        <div id="import-progress-box" class="import-progress-box" aria-live="polite">
+          <div class="import-progress-top">
+            <span id="import-progress-label">Extraindo vídeos da playlist...</span>
+            <span id="import-progress-percent">0%</span>
+          </div>
+          <div class="import-bar-track">
+            <div id="import-bar-fill" class="import-bar-fill"></div>
+          </div>
+        </div>
+      </div>
 
       <!-- Backup JSON (Exportar / Importar) -->
       <div class="header-actions">
-        <button type="button" id="btn-export-json" class="btn-ghost" title="Exportar backup da biblioteca em JSON">
+        <button type="button" id="btn-export-json" class="btn-ghost" title="Exportar backup JSON para transferir entre dispositivos">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="7 10 12 15 17 10"></polyline>
             <line x1="12" y1="15" x2="12" y2="3"></line>
           </svg>
-          <span class="btn-label-desktop">Exportar</span>
+          <span class="btn-label-desktop">Exportar JSON</span>
         </button>
         <button type="button" id="btn-import-json" class="btn-ghost" title="Importar backup JSON">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -816,7 +1137,7 @@
             <polyline points="17 8 12 3 7 8"></polyline>
             <line x1="12" y1="3" x2="12" y2="15"></line>
           </svg>
-          <span class="btn-label-desktop">Importar</span>
+          <span class="btn-label-desktop">Importar JSON</span>
         </button>
         <input type="file" id="import-file-input" accept="application/json,.json" hidden />
       </div>
@@ -824,20 +1145,23 @@
   </header>
 
   <!-- ========================================================================
-       PLAYER DE CINEMA RESPONSIVO (ABRE AO CLICAR EM UM VÍDEO)
+       PLAYER DE CINEMA INTEGRADO (ABRE NO TOPO AO REPRODUZIR)
        ======================================================================== -->
-  <section id="cinema-section" class="cinema-section" aria-label="Player de Vídeo">
+  <section id="cinema-section" class="cinema-section" aria-label="Player de Cinema GlauTube">
     <div class="cinema-wrapper">
       <div class="cinema-topbar">
         <div class="cinema-meta">
-          <div class="cinema-badge">
-            <span class="pulse-dot"></span>
-            <span id="cinema-status-label">Reproduzindo Agora</span>
+          <div class="cinema-badges">
+            <span class="cinema-live-badge">
+              <span class="pulse-dot"></span>
+              <span id="cinema-status-label">Reproduzindo Agora</span>
+            </span>
+            <span id="cinema-playlist-tag" class="cinema-playlist-tag"></span>
           </div>
-          <h1 id="cinema-video-title" class="cinema-title">Carregando título do vídeo...</h1>
+          <h1 id="cinema-video-title" class="cinema-title">Carregando vídeo...</h1>
         </div>
 
-        <button type="button" id="btn-close-cinema" class="btn-ghost" title="Minimizar / Fechar player">
+        <button type="button" id="btn-close-cinema" class="btn-ghost" title="Fechar player">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -853,7 +1177,7 @@
       <div class="cinema-controls">
         <div class="control-group">
           <button type="button" id="btn-skip-back" class="btn-control" title="Voltar 15 segundos">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="1 4 1 10 7 10"></polyline>
               <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
             </svg>
@@ -861,7 +1185,7 @@
           </button>
 
           <button type="button" id="btn-skip-forward" class="btn-control" title="Avançar 15 segundos">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="23 4 23 10 17 10"></polyline>
               <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
             </svg>
@@ -869,18 +1193,26 @@
           </button>
 
           <button type="button" id="btn-restart-active" class="btn-control" title="Reiniciar do zero (00:00)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <polygon points="19 20 9 12 19 4 19 20"></polygon>
               <line x1="5" y1="19" x2="5" y2="5"></line>
             </svg>
             <span>Reiniciar</span>
           </button>
 
-          <button type="button" id="btn-mark-completed" class="btn-control success" title="Marcar vídeo como concluído">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <button type="button" id="btn-mark-completed" class="btn-control success" title="Marcar como concluído">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
             <span>Marcar Concluído</span>
+          </button>
+
+          <button type="button" id="btn-next-in-queue" class="btn-control accent" title="Reproduzir próximo vídeo da fila ou playlist">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 4 15 12 5 20 5 4"></polygon>
+              <rect x="17" y="5" width="2.5" height="14"></rect>
+            </svg>
+            <span>Próximo da Fila</span>
           </button>
         </div>
 
@@ -890,118 +1222,177 @@
             <polyline points="17 21 17 13 7 13 7 21"></polyline>
             <polyline points="7 3 7 8 15 8"></polyline>
           </svg>
-          <span>Salvamento automático ativo (a cada 2s)</span>
+          <span>Salvamento automático a cada 2s</span>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ========================================================================
-       PRATELEIRAS ESTILO NETFLIX
+       CONTEÚDO PRINCIPAL & PRATELEIRAS ESTILO NETFLIX
        ======================================================================== -->
-  <main id="top" class="main-content">
-    <!-- SEÇÃO 1: CONTINUAR ASSISTINDO (SEMPRE NO TOPO) -->
-    <section aria-labelledby="heading-continue">
+  <main id="top" class="main-container">
+    <!-- Barra de Abas / Filtro por Coleção -->
+    <nav class="filter-bar" aria-label="Filtros de Coleções e Playlists">
+      <div id="filter-pills-container" class="filter-pills"></div>
+    </nav>
+
+    <!-- Banner de Vídeos de Demonstração -->
+    <div id="demo-banner" class="demo-banner">
+      <span>Você está vendo vídeos de demonstração pré-carregados no <strong>GlauTube</strong> para testar o salvamento de progresso.</span>
+      <button type="button" id="btn-clear-demos" class="btn-ghost danger">Limpar Exemplos</button>
+    </div>
+
+    <!-- PRATELEIRA 1: CONTINUAR ASSISTINDO (SEMPRE FIXADA NO TOPO) -->
+    <section id="section-continue" class="shelf-section" aria-labelledby="heading-continue">
       <div class="shelf-header">
-        <div class="shelf-title-wrap">
+        <div class="shelf-title-group">
           <h2 id="heading-continue" class="shelf-title">Continuar Assistindo</h2>
           <span id="count-continue" class="shelf-count">0</span>
         </div>
-        <span class="shelf-hint">Retoma exatamente do segundo onde você parou</span>
+        <span class="shelf-hint">Retoma exatamente do segundo em que você parou</span>
       </div>
       <div id="shelf-continue" class="cards-grid"></div>
     </section>
 
-    <!-- SEÇÃO 2: MINHA LISTA (PARA ASSISTIR) -->
-    <section aria-labelledby="heading-watchlist">
+    <!-- PRATELEIRAS DINÂMICAS POR PLAYLIST IMPORTADA -->
+    <div id="playlists-shelves-container" style="display: flex; flex-direction: column; gap: 2.3rem;"></div>
+
+    <!-- PRATELEIRA: MINHA LISTA (AVULSOS / PARA ASSISTIR) -->
+    <section id="section-watchlist" class="shelf-section" aria-labelledby="heading-watchlist">
       <div class="shelf-header">
-        <div class="shelf-title-wrap">
+        <div class="shelf-title-group">
           <h2 id="heading-watchlist" class="shelf-title">Minha Lista (Para Assistir)</h2>
           <span id="count-watchlist" class="shelf-count">0</span>
         </div>
-        <span class="shelf-hint">Vídeos salvos aguardando sua primeira reprodução</span>
+        <span class="shelf-hint">Vídeos individuais salvos na sua fila</span>
       </div>
       <div id="shelf-watchlist" class="cards-grid"></div>
     </section>
 
-    <!-- SEÇÃO 3: ASSISTIDOS RECENTEMENTE (CONCLUÍDOS) -->
-    <section aria-labelledby="heading-completed">
+    <!-- PRATELEIRA: ASSISTIDOS / CONCLUÍDOS -->
+    <section id="section-completed" class="shelf-section" aria-labelledby="heading-completed">
       <div class="shelf-header">
-        <div class="shelf-title-wrap">
-          <h2 id="heading-completed" class="shelf-title">Assistidos Recentemente (Concluídos)</h2>
+        <div class="shelf-title-group">
+          <h2 id="heading-completed" class="shelf-title">Assistidos / Concluídos</h2>
           <span id="count-completed" class="shelf-count">0</span>
         </div>
-        <span class="shelf-hint">Vídeos com 95% ou mais concluídos</span>
+        <span class="shelf-hint">Vídeos concluídos (95% ou mais)</span>
       </div>
       <div id="shelf-completed" class="cards-grid"></div>
     </section>
   </main>
 
-  <!-- Container de Notificações Toast -->
+  <!-- Rodapé -->
+  <footer class="app-footer">
+    <p><strong>GlauTube</strong> — Seu Controlador Pessoal de Streaming do YouTube. Progresso salvo localmente no seu navegador.</p>
+  </footer>
+
+  <!-- Elemento Oculto para Extração de Playlist via YouTube IFrame API -->
+  <div id="hidden-playlist-extractor" aria-hidden="true"></div>
+
+  <!-- Notificações Toast -->
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
   <!-- ========================================================================
-       LÓGICA DO APLICATIVO & INTEGRAÇÃO YOUTUBE IFRAME PLAYER API
+       LÓGICA DO GLAUTUBE (PLAYER, IMPORTADOR DE PLAYLIST E PERSISTÊNCIA)
        ======================================================================== -->
   <script>
     (function () {
       'use strict';
 
-      const STORAGE_KEY = 'meu_stream_library_v1';
+      const STORAGE_KEY = 'glautube_library_v1';
 
-      // Vídeos iniciais pré-configurados (filmes abertos / educativos reais e incorporáveis)
-      const DEFAULT_SEED_VIDEOS = [
+      // Vídeos iniciais de demonstração (curtas abertos oficiais da Blender Foundation)
+      const DEMO_VIDEOS = [
         {
           id: 'aqz-KE-bpKQ',
           title: 'Big Buck Bunny 60fps 4K - Blender Open Movie',
-          currentTime: 214, // 03:34
-          duration: 634,    // 10:34
-          lastWatched: Date.now() - 1000 * 60 * 12,
-          completed: false
+          author: 'Blender Foundation',
+          currentTime: 198,
+          duration: 634,
+          lastWatched: Date.now() - 1000 * 60 * 10,
+          completed: false,
+          playlistId: null,
+          playlistName: null,
+          isDemo: true
         },
         {
           id: 'R6MlUcmOul8',
           title: 'Tears of Steel - Blender Foundation Sci-Fi Short Film',
-          currentTime: 412, // 06:52
-          duration: 734,    // 12:14
-          lastWatched: Date.now() - 1000 * 60 * 95,
-          completed: false
+          author: 'Blender Foundation',
+          currentTime: 385,
+          duration: 734,
+          lastWatched: Date.now() - 1000 * 60 * 65,
+          completed: false,
+          playlistId: null,
+          playlistName: null,
+          isDemo: true
         },
         {
           id: 'eRsGyueVLvQ',
           title: 'Sintel - Open Movie by Blender Foundation',
+          author: 'Blender Foundation',
           currentTime: 0,
-          duration: 888,    // 14:48
+          duration: 888,
           lastWatched: null,
-          completed: false
+          completed: false,
+          playlistId: null,
+          playlistName: null,
+          isDemo: true
         }
       ];
 
-      // Estado Global da Aplicação
-      let library = [];
+      // Estado Global
+      let state = {
+        videos: [],
+        playlists: {} // { [playlistId]: { id, name, importedAt } }
+      };
+
+      let activeFilter = 'all'; // 'all' | 'watchlist' | 'completed' | 'playlist:<id>'
       let activeVideoId = null;
       let ytPlayer = null;
       let isYtApiReady = false;
       let pendingVideoToPlay = null;
       let progressSaveTimer = null;
-      let lastDeletedBackup = null;
+      let isImporting = false;
+      let undoBuffer = null;
 
-      // Referências DOM
-      const cinemaSection = document.getElementById('cinema-section');
-      const cinemaVideoTitle = document.getElementById('cinema-video-title');
-      const cinemaStatusLabel = document.getElementById('cinema-status-label');
-      const syncStatusText = document.getElementById('sync-status-text');
+      // Elementos DOM
+      const importForm = document.getElementById('import-form');
       const urlInput = document.getElementById('youtube-url-input');
-      const addForm = document.getElementById('add-video-form');
-      const importFileInput = document.getElementById('import-file-input');
+      const detectedTypePill = document.getElementById('detected-type-pill');
+      const btnSubmitImport = document.getElementById('btn-submit-import');
+      const btnSubmitLabel = document.getElementById('btn-submit-label');
+      const playlistNameRow = document.getElementById('playlist-name-row');
+      const playlistCustomNameInput = document.getElementById('playlist-custom-name');
+      const importProgressBox = document.getElementById('import-progress-box');
+      const importProgressLabel = document.getElementById('import-progress-label');
+      const importProgressPercent = document.getElementById('import-progress-percent');
+      const importBarFill = document.getElementById('import-bar-fill');
 
+      const cinemaSection = document.getElementById('cinema-section');
+      const cinemaStatusLabel = document.getElementById('cinema-status-label');
+      const cinemaPlaylistTag = document.getElementById('cinema-playlist-tag');
+      const cinemaVideoTitle = document.getElementById('cinema-video-title');
+      const syncStatusText = document.getElementById('sync-status-text');
+      const btnNextInQueue = document.getElementById('btn-next-in-queue');
+
+      const filterPillsContainer = document.getElementById('filter-pills-container');
+      const demoBanner = document.getElementById('demo-banner');
       const shelfContinue = document.getElementById('shelf-continue');
+      const playlistsShelvesContainer = document.getElementById('playlists-shelves-container');
       const shelfWatchlist = document.getElementById('shelf-watchlist');
       const shelfCompleted = document.getElementById('shelf-completed');
+
+      const sectionContinue = document.getElementById('section-continue');
+      const sectionWatchlist = document.getElementById('section-watchlist');
+      const sectionCompleted = document.getElementById('section-completed');
 
       const countContinue = document.getElementById('count-continue');
       const countWatchlist = document.getElementById('count-watchlist');
       const countCompleted = document.getElementById('count-completed');
+      const importFileInput = document.getElementById('import-file-input');
 
       // ======================================================================
       // PERSISTÊNCIA LOCAL (LOCALSTORAGE)
@@ -1010,79 +1401,502 @@
         try {
           const raw = localStorage.getItem(STORAGE_KEY);
           if (!raw) {
-            library = JSON.parse(JSON.stringify(DEFAULT_SEED_VIDEOS));
+            state = {
+              videos: JSON.parse(JSON.stringify(DEMO_VIDEOS)),
+              playlists: {}
+            };
             saveLibrary();
             return;
           }
           const parsed = JSON.parse(raw);
-          library = Array.isArray(parsed) ? parsed : [];
+          if (Array.isArray(parsed)) {
+            state = { videos: parsed, playlists: {} };
+          } else {
+            state = {
+              videos: Array.isArray(parsed.videos) ? parsed.videos : [],
+              playlists: parsed.playlists && typeof parsed.playlists === 'object' ? parsed.playlists : {}
+            };
+          }
         } catch (err) {
-          console.error('Erro ao ler localStorage:', err);
-          library = JSON.parse(JSON.stringify(DEFAULT_SEED_VIDEOS));
+          console.error('Erro ao carregar GlauTube localStorage:', err);
+          state = { videos: JSON.parse(JSON.stringify(DEMO_VIDEOS)), playlists: {} };
         }
       }
 
       function saveLibrary() {
         try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(library));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         } catch (err) {
           console.error('Erro ao salvar no localStorage:', err);
-          showToast('Aviso: Não foi possível salvar no armazenamento local.');
+          showToast('Aviso: Espaço de armazenamento local cheio ou bloqueado.');
         }
       }
 
       // ======================================================================
-      // UTILITÁRIOS DE EXTRAÇÃO DE ID, FORMATAÇÃO DE TEMPO E METADADOS
+      // ANALISADOR DE LINKS (VÍDEO INDIVIDUAL vs PLAYLIST)
       // ======================================================================
-      function extractYouTubeId(input) {
-        if (!input) return null;
+      function parseYouTubeUrl(input) {
+        if (!input || typeof input !== 'string') {
+          return { type: 'invalid', videoId: null, playlistId: null };
+        }
         const trimmed = input.trim();
 
-        // Caso seja diretamente o ID de 11 caracteres
+        // Verifica se é apenas um ID de vídeo (11 chars)
         if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) {
-          return trimmed;
+          return { type: 'video', videoId: trimmed, playlistId: null };
         }
 
-        // Padrões comuns de URL do YouTube (watch, youtu.be, shorts, embed, live)
-        const patterns = [
-          /(?:youtube\.com\/watch\?.*v=)([a-zA-Z0-9_-]{11})/,
-          /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
-          /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
-          /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
-          /(?:youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/,
-          /[?&]v=([a-zA-Z0-9_-]{11})/
-        ];
+        // Verifica se é apenas um ID de playlist (ex: PL..., UU..., OLAK5uy_...)
+        if (/^(PL|UU|LL|FL|OLAK5uy_)[a-zA-Z0-9_-]{10,}$/.test(trimmed)) {
+          return { type: 'playlist', videoId: null, playlistId: trimmed };
+        }
 
-        for (const regex of patterns) {
-          const match = trimmed.match(regex);
-          if (match && match[1]) {
-            return match[1];
+        let playlistId = null;
+        let videoId = null;
+
+        try {
+          const normalizedUrl = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+          const urlObj = new URL(normalizedUrl);
+          const listParam = urlObj.searchParams.get('list');
+          if (listParam && /^[a-zA-Z0-9_-]{10,}$/.test(listParam)) {
+            playlistId = listParam;
           }
+
+          const vParam = urlObj.searchParams.get('v');
+          if (vParam && /^[a-zA-Z0-9_-]{11}$/.test(vParam)) {
+            videoId = vParam;
+          } else if (urlObj.hostname.includes('youtu.be')) {
+            const seg = urlObj.pathname.split('/').filter(Boolean)[0];
+            if (seg && /^[a-zA-Z0-9_-]{11}$/.test(seg)) videoId = seg;
+          } else if (urlObj.pathname.startsWith('/shorts/') || urlObj.pathname.startsWith('/embed/') || urlObj.pathname.startsWith('/live/')) {
+            const seg = urlObj.pathname.split('/').filter(Boolean)[1];
+            if (seg && /^[a-zA-Z0-9_-]{11}$/.test(seg)) videoId = seg;
+          }
+        } catch (e) {
+          // Fallback via regex caso a string tenha texto extra junto ao link
+          const listMatch = trimmed.match(/[?&]list=([a-zA-Z0-9_-]{10,})/);
+          if (listMatch) playlistId = listMatch[1];
+
+          const vidMatch = trimmed.match(/(?:v=|youtu\.be\/|shorts\/|embed\/|live\/)([a-zA-Z0-9_-]{11})/);
+          if (vidMatch) videoId = vidMatch[1];
         }
+
+        // Prioriza importação completa da playlist sempre que list= estiver presente
+        if (playlistId) {
+          return { type: 'playlist', videoId, playlistId };
+        }
+        if (videoId) {
+          return { type: 'video', videoId, playlistId: null };
+        }
+        return { type: 'invalid', videoId: null, playlistId: null };
+      }
+
+      // Atualiza feedback visual em tempo real enquanto o usuário digita ou cola
+      function updateInputDetectionUI() {
+        const parsed = parseYouTubeUrl(urlInput.value);
+        if (parsed.type === 'playlist') {
+          detectedTypePill.textContent = 'Playlist';
+          detectedTypePill.classList.add('visible');
+          playlistNameRow.classList.add('visible');
+          btnSubmitLabel.textContent = 'Importar Playlist';
+        } else if (parsed.type === 'video') {
+          detectedTypePill.textContent = 'Vídeo';
+          detectedTypePill.classList.add('visible');
+          playlistNameRow.classList.remove('visible');
+          btnSubmitLabel.textContent = 'Adicionar Vídeo';
+        } else {
+          detectedTypePill.classList.remove('visible');
+          playlistNameRow.classList.remove('visible');
+          btnSubmitLabel.textContent = 'Adicionar';
+        }
+      }
+
+      // ======================================================================
+      // METADADOS DE VÍDEO & EXTRAÇÃO COMPLETA DE PLAYLIST
+      // ======================================================================
+      async function fetchVideoMetadata(videoId) {
+        const watchUrl = encodeURIComponent(`https://www.youtube.com/watch?v=${videoId}`);
+
+        // 1. Tenta YouTube oEmbed oficial
+        try {
+          const res = await fetch(`https://www.youtube.com/oembed?url=${watchUrl}&format=json`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.title) {
+              return {
+                title: data.title.trim(),
+                author: data.author_name ? data.author_name.trim() : 'YouTube'
+              };
+            }
+          }
+        } catch (err) {
+          // Segue para fallback
+        }
+
+        // 2. Fallback via noembed.com
+        try {
+          const res2 = await fetch(`https://noembed.com/embed?url=${watchUrl}`);
+          if (res2.ok) {
+            const data2 = await res2.json();
+            if (data2 && data2.title) {
+              return {
+                title: data2.title.trim(),
+                author: data2.author_name ? data2.author_name.trim() : 'YouTube'
+              };
+            }
+          }
+        } catch (err) {
+          // Segue para fallback final
+        }
+
+        return {
+          title: `Vídeo do YouTube (${videoId})`,
+          author: 'YouTube'
+        };
+      }
+
+      // Extrai todos os IDs da playlist usando um player oculto da YouTube IFrame API
+      function extractPlaylistIdsViaIFrame(playlistId) {
+        return new Promise((resolve) => {
+          if (!isYtApiReady || !window.YT || !window.YT.Player) {
+            resolve([]);
+            return;
+          }
+
+          const host = document.getElementById('hidden-playlist-extractor');
+          const mountId = 'temp-yt-pl-' + Date.now();
+          host.innerHTML = `<div id="${mountId}"></div>`;
+
+          let tempPlayer = null;
+          let settled = false;
+
+          const cleanupAndResolve = (ids) => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timeoutId);
+            try {
+              if (tempPlayer && typeof tempPlayer.destroy === 'function') {
+                tempPlayer.destroy();
+              }
+            } catch (e) { /* ignora */ }
+            host.innerHTML = '';
+            resolve(Array.isArray(ids) ? ids : []);
+          };
+
+          const timeoutId = setTimeout(() => {
+            try {
+              if (tempPlayer && typeof tempPlayer.getPlaylist === 'function') {
+                const list = tempPlayer.getPlaylist();
+                if (Array.isArray(list) && list.length > 0) {
+                  cleanupAndResolve(list);
+                  return;
+                }
+              }
+            } catch (e) { /* ignora */ }
+            cleanupAndResolve([]);
+          }, 7000);
+
+          try {
+            tempPlayer = new YT.Player(mountId, {
+              width: '200',
+              height: '200',
+              playerVars: {
+                listType: 'playlist',
+                list: playlistId,
+                autoplay: 0,
+                controls: 0
+              },
+              events: {
+                onReady: (ev) => {
+                  try {
+                    ev.target.mute();
+                    const list = ev.target.getPlaylist();
+                    if (Array.isArray(list) && list.length > 0) {
+                      cleanupAndResolve(list);
+                    } else {
+                      // Dá um breve play mudo caso a API aguarde inicialização para popular getPlaylist()
+                      ev.target.playVideo();
+                    }
+                  } catch (e) {
+                    cleanupAndResolve([]);
+                  }
+                },
+                onStateChange: (ev) => {
+                  try {
+                    ev.target.mute();
+                    const list = ev.target.getPlaylist();
+                    if (Array.isArray(list) && list.length > 0) {
+                      ev.target.stopVideo();
+                      cleanupAndResolve(list);
+                    }
+                  } catch (e) { /* aguarda */ }
+                },
+                onError: () => {
+                  cleanupAndResolve([]);
+                }
+              }
+            });
+          } catch (err) {
+            cleanupAndResolve([]);
+          }
+        });
+      }
+
+      // Fallback: Extrai IDs, títulos e nome da playlist via Feed XML público + AllOrigins CORS proxy
+      async function extractPlaylistViaXmlFeed(playlistId) {
+        try {
+          const feedUrl = encodeURIComponent(`https://www.youtube.com/feeds/videos.xml?playlist_id=${playlistId}`);
+          const res = await fetch(`https://api.allorigins.win/get?url=${feedUrl}`);
+          if (!res.ok) return { title: null, items: [] };
+          const payload = await res.json();
+          if (!payload || !payload.contents) return { title: null, items: [] };
+
+          const parser = new DOMParser();
+          const xml = parser.parseFromString(payload.contents, 'text/xml');
+          const feedTitleNode = xml.querySelector('feed > title');
+          const playlistTitle = feedTitleNode ? feedTitleNode.textContent.trim() : null;
+
+          const entries = Array.from(xml.querySelectorAll('entry'));
+          const items = entries.map((entry) => {
+            const vidNode = entry.getElementsByTagName('yt:videoId')[0];
+            const titleNode = entry.querySelector('title');
+            const authorNode = entry.querySelector('author > name');
+            return {
+              id: vidNode ? vidNode.textContent.trim() : null,
+              title: titleNode ? titleNode.textContent.trim() : null,
+              author: authorNode ? authorNode.textContent.trim() : 'YouTube'
+            };
+          }).filter((item) => item.id && item.id.length === 11);
+
+          return { title: playlistTitle, items };
+        } catch (err) {
+          console.warn('Fallback XML falhou:', err);
+          return { title: null, items: [] };
+        }
+      }
+
+      // Tenta descobrir o nome oficial da playlist via oEmbed
+      async function fetchPlaylistTitle(playlistId) {
+        try {
+          const plUrl = encodeURIComponent(`https://www.youtube.com/playlist?list=${playlistId}`);
+          const res = await fetch(`https://www.youtube.com/oembed?url=${plUrl}&format=json`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.title) return data.title.trim();
+          }
+        } catch (e) { /* fallback */ }
         return null;
       }
 
+      function setImportProgress(visible, label = '', percent = 0) {
+        if (!visible) {
+          importProgressBox.classList.remove('visible');
+          importBarFill.style.width = '0%';
+          return;
+        }
+        importProgressBox.classList.add('visible');
+        importProgressLabel.textContent = label;
+        const clamped = Math.min(100, Math.max(0, Math.round(percent)));
+        importProgressPercent.textContent = `${clamped}%`;
+        importBarFill.style.width = `${clamped}%`;
+      }
+
+      async function handleImportPlaylist(playlistId, customNameRaw) {
+        if (isImporting) return;
+        isImporting = true;
+        btnSubmitImport.disabled = true;
+
+        try {
+          setImportProgress(true, 'Conectando à playlist do YouTube...', 8);
+
+          // Executa extração via IFrame API e busca do nome oficial em paralelo
+          const [iframeIds, oembedPlTitle] = await Promise.all([
+            extractPlaylistIdsViaIFrame(playlistId),
+            customNameRaw ? Promise.resolve(customNameRaw) : fetchPlaylistTitle(playlistId)
+          ]);
+
+          let videoEntries = [];
+          let resolvedPlaylistName = customNameRaw || oembedPlTitle;
+
+          if (iframeIds.length > 0) {
+            videoEntries = iframeIds.map((id) => ({ id, title: null, author: null }));
+          } else {
+            setImportProgress(true, 'Tentando método alternativo (Feed XML)...', 18);
+            const xmlResult = await extractPlaylistViaXmlFeed(playlistId);
+            videoEntries = xmlResult.items;
+            if (!resolvedPlaylistName && xmlResult.title) {
+              resolvedPlaylistName = xmlResult.title;
+            }
+          }
+
+          if (!videoEntries || videoEntries.length === 0) {
+            setImportProgress(false);
+            showToast('Não foi possível ler esta playlist. Verifique se ela é Pública ou Não Listada.');
+            return;
+          }
+
+          // Remove IDs duplicados dentro da própria playlist mantendo a ordem
+          const uniqueMap = new Map();
+          for (const item of videoEntries) {
+            if (!uniqueMap.has(item.id)) {
+              uniqueMap.set(item.id, item);
+            }
+          }
+          const uniqueEntries = Array.from(uniqueMap.values());
+          const total = uniqueEntries.length;
+
+          if (!resolvedPlaylistName) {
+            resolvedPlaylistName = `Playlist (${playlistId.slice(0, 8)}...)`;
+          }
+
+          // Registra a playlist na biblioteca
+          state.playlists[playlistId] = {
+            id: playlistId,
+            name: resolvedPlaylistName,
+            importedAt: Date.now()
+          };
+
+          // Busca títulos e autores em lotes paralelos (6 por vez)
+          let completedMeta = 0;
+          const BATCH_SIZE = 6;
+          const enrichedItems = [];
+
+          for (let i = 0; i < uniqueEntries.length; i += BATCH_SIZE) {
+            const batch = uniqueEntries.slice(i, i + BATCH_SIZE);
+            const batchResults = await Promise.all(
+              batch.map(async (entry) => {
+                if (entry.title) {
+                  completedMeta++;
+                  return entry;
+                }
+                const meta = await fetchVideoMetadata(entry.id);
+                completedMeta++;
+                return {
+                  id: entry.id,
+                  title: meta.title,
+                  author: meta.author
+                };
+              })
+            );
+
+            enrichedItems.push(...batchResults);
+            const pct = 20 + (completedMeta / total) * 78;
+            setImportProgress(true, `Importando ${completedMeta} de ${total} vídeos...`, pct);
+          }
+
+          // Mescla com a biblioteca existente sem perder progresso salvo
+          let addedCount = 0;
+          let updatedCount = 0;
+
+          enrichedItems.forEach((item, idx) => {
+            const existing = state.videos.find((v) => v.id === item.id);
+            if (existing) {
+              // Se já existia, apenas associa à playlist caso ainda não tivesse playlist
+              if (!existing.playlistId) {
+                existing.playlistId = playlistId;
+                existing.playlistName = resolvedPlaylistName;
+                existing.playlistOrder = idx;
+                updatedCount++;
+              }
+            } else {
+              state.videos.push({
+                id: item.id,
+                title: item.title,
+                author: item.author || 'YouTube',
+                currentTime: 0,
+                duration: 0,
+                lastWatched: null,
+                completed: false,
+                playlistId: playlistId,
+                playlistName: resolvedPlaylistName,
+                playlistOrder: idx,
+                isDemo: false
+              });
+              addedCount++;
+            }
+          });
+
+          saveLibrary();
+          activeFilter = `playlist:${playlistId}`;
+          renderAll();
+
+          urlInput.value = '';
+          playlistCustomNameInput.value = '';
+          updateInputDetectionUI();
+          setImportProgress(true, 'Playlist importada com sucesso!', 100);
+          setTimeout(() => setImportProgress(false), 1200);
+
+          const summaryMsg = updatedCount > 0
+            ? `"${resolvedPlaylistName}": ${addedCount} novos vídeos importados (${updatedCount} já estavam na biblioteca).`
+            : `"${resolvedPlaylistName}": ${addedCount} vídeos importados com sucesso!`;
+          showToast(summaryMsg);
+        } finally {
+          isImporting = false;
+          btnSubmitImport.disabled = false;
+        }
+      }
+
+      async function handleAddSingleVideo(videoId) {
+        if (isImporting) return;
+
+        const existing = state.videos.find((v) => v.id === videoId);
+        if (existing) {
+          urlInput.value = '';
+          updateInputDetectionUI();
+          showToast(`"${existing.title}" já está no GlauTube! Abrindo...`);
+          openVideoInCinema(videoId);
+          return;
+        }
+
+        isImporting = true;
+        btnSubmitImport.disabled = true;
+        btnSubmitLabel.textContent = 'Buscando...';
+
+        try {
+          const meta = await fetchVideoMetadata(videoId);
+          state.videos.unshift({
+            id: videoId,
+            title: meta.title,
+            author: meta.author,
+            currentTime: 0,
+            duration: 0,
+            lastWatched: null,
+            completed: false,
+            playlistId: null,
+            playlistName: null,
+            isDemo: false
+          });
+
+          saveLibrary();
+          urlInput.value = '';
+          updateInputDetectionUI();
+          renderAll();
+          showToast(`Adicionado à Minha Lista: "${meta.title}"`, 'Assistir', () => openVideoInCinema(videoId));
+        } finally {
+          isImporting = false;
+          btnSubmitImport.disabled = false;
+          updateInputDetectionUI();
+        }
+      }
+
+      // ======================================================================
+      // FORMATAÇÃO DE TEMPO & REGRAS DE ESTADO DOS VÍDEOS
+      // ======================================================================
       function formatTime(seconds) {
         if (!seconds || isNaN(seconds) || seconds < 0) return '00:00';
         const total = Math.floor(seconds);
         const hrs = Math.floor(total / 3600);
         const mins = Math.floor((total % 3600) / 60);
         const secs = total % 60;
-
         const pad = (n) => String(n).padStart(2, '0');
-        if (hrs > 0) {
-          return `${hrs}:${pad(mins)}:${pad(secs)}`;
-        }
-        return `${pad(mins)}:${pad(secs)}`;
+        return hrs > 0 ? `${hrs}:${pad(mins)}:${pad(secs)}` : `${pad(mins)}:${pad(secs)}`;
       }
 
       function formatRemainingText(currentTime, duration) {
-        if (!duration || duration <= 0) return 'Iniciado';
-        const remainingSecs = Math.max(0, Math.round(duration - currentTime));
-        if (remainingSecs < 60) {
-          return `Restam ${remainingSecs}s`;
-        }
-        const mins = Math.ceil(remainingSecs / 60);
+        if (!duration || duration <= 0) return 'Em andamento';
+        const remSecs = Math.max(0, Math.round(duration - currentTime));
+        if (remSecs < 60) return `Restam ${remSecs}s`;
+        const mins = Math.ceil(remSecs / 60);
         if (mins >= 60) {
           const h = Math.floor(mins / 60);
           const m = mins % 60;
@@ -1094,88 +1908,87 @@
       function getProgressPercent(video) {
         if (video.completed) return 100;
         if (!video.duration || video.duration <= 0) return 0;
-        const pct = (video.currentTime / video.duration) * 100;
-        return Math.min(100, Math.max(0, pct));
+        return Math.min(100, Math.max(0, (video.currentTime / video.duration) * 100));
       }
 
       function isVideoCompleted(video) {
         if (video.completed) return true;
-        if (video.duration > 0 && (video.currentTime / video.duration) >= 0.95) {
-          return true;
-        }
+        if (video.duration > 0 && (video.currentTime / video.duration) >= 0.95) return true;
         return false;
       }
 
       function isVideoInProgress(video) {
         if (isVideoCompleted(video)) return false;
-        return video.currentTime > 3;
+        return (video.currentTime || 0) > 3;
       }
 
-      async function fetchVideoTitleFromNoembed(videoId) {
-        try {
-          const targetUrl = encodeURIComponent(`https://www.youtube.com/watch?v=${videoId}`);
-          const response = await fetch(`https://noembed.com/embed?url=${targetUrl}`);
-          if (!response.ok) throw new Error('Falha na resposta noembed');
-          const data = await response.json();
-          if (data && data.title) {
-            return data.title;
-          }
-        } catch (err) {
-          // Fallback silencioso caso offline ou bloqueado
+      // ======================================================================
+      // RENDERIZAÇÃO DE ABAS, CARTÕES E PRATELEIRAS NETFLIX
+      // ======================================================================
+      function renderFilterPills() {
+        const playlistIds = Object.keys(state.playlists);
+        const totalVideos = state.videos.length;
+
+        // Garante que o filtro ativo ainda exista
+        if (activeFilter.startsWith('playlist:')) {
+          const plId = activeFilter.replace('playlist:', '');
+          if (!state.playlists[plId]) activeFilter = 'all';
         }
-        return `Vídeo do YouTube (${videoId})`;
-      }
 
-      // ======================================================================
-      // NOTIFICAÇÕES TOAST INTERATIVAS
-      // ======================================================================
-      function showToast(message, actionLabel = null, actionCallback = null) {
-        const container = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        toast.className = 'toast';
+        const pills = [
+          { id: 'all', label: 'Todos', count: totalVideos }
+        ];
 
-        const textSpan = document.createElement('span');
-        textSpan.textContent = message;
-        toast.appendChild(textSpan);
+        for (const plId of playlistIds) {
+          const pl = state.playlists[plId];
+          const count = state.videos.filter((v) => v.playlistId === plId).length;
+          pills.push({
+            id: `playlist:${plId}`,
+            label: pl.name,
+            count
+          });
+        }
 
-        if (actionLabel && typeof actionCallback === 'function') {
+        const standaloneCount = state.videos.filter((v) => !v.playlistId && !isVideoCompleted(v)).length;
+        const completedCount = state.videos.filter((v) => isVideoCompleted(v)).length;
+
+        pills.push({ id: 'watchlist', label: 'Minha Lista', count: standaloneCount });
+        pills.push({ id: 'completed', label: 'Concluídos', count: completedCount });
+
+        filterPillsContainer.innerHTML = '';
+        pills.forEach((p) => {
           const btn = document.createElement('button');
           btn.type = 'button';
-          btn.className = 'toast-action';
-          btn.textContent = actionLabel;
+          btn.className = 'filter-pill' + (activeFilter === p.id ? ' active' : '');
+          btn.innerHTML = `<span>${escapeHtml(p.label)}</span><span class="pill-badge">${p.count}</span>`;
           btn.onclick = () => {
-            actionCallback();
-            toast.remove();
+            activeFilter = p.id;
+            renderAll();
           };
-          toast.appendChild(btn);
-        }
-
-        container.appendChild(toast);
-
-        setTimeout(() => {
-          if (toast.parentNode) {
-            toast.style.opacity = '0';
-            toast.style.transition = 'opacity 0.25s ease';
-            setTimeout(() => toast.remove(), 260);
-          }
-        }, 4200);
+          filterPillsContainer.appendChild(btn);
+        });
       }
 
-      // ======================================================================
-      // RENDERIZAÇÃO DAS 3 PRATELEIRAS ESTILO NETFLIX
-      // ======================================================================
-      function createVideoCardElement(video, shelfType) {
+      function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str || '';
+        return div.innerHTML;
+      }
+
+      function createVideoCard(video, contextType) {
         const card = document.createElement('article');
         card.className = 'video-card' + (video.id === activeVideoId ? ' is-playing' : '');
 
         const pct = getProgressPercent(video);
+        const completed = isVideoCompleted(video);
+        const inProgress = isVideoInProgress(video);
         const thumbUrl = `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`;
-        const fallbackThumb = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='270' viewBox='0 0 480 270'%3E%3Crect width='480' height='270' fill='%23181818'/%3E%3Cpolygon points='215,105 280,135 215,165' fill='%23E50914'/%3E%3C/svg%3E`;
+        const fallbackSvg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='270' viewBox='0 0 480 270'%3E%3Crect width='480' height='270' fill='%23181818'/%3E%3Cpolygon points='215,105 280,135 215,165' fill='%23E50914'/%3E%3C/svg%3E`;
 
-        // Área da Thumbnail
+        // Miniatura
         const thumbWrap = document.createElement('div');
         thumbWrap.className = 'thumb-wrapper';
-        thumbWrap.title = `Assistir: ${video.title}`;
+        thumbWrap.title = `Reproduzir: ${video.title}`;
         thumbWrap.onclick = () => openVideoInCinema(video.id);
 
         const img = document.createElement('img');
@@ -1185,14 +1998,14 @@
         img.loading = 'lazy';
         img.onerror = function () {
           this.onerror = null;
-          this.src = fallbackThumb;
+          this.src = fallbackSvg;
         };
 
         const overlay = document.createElement('div');
         overlay.className = 'thumb-overlay';
         overlay.innerHTML = `
           <div class="play-circle" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
               <polygon points="7 4 20 12 7 20 7 4"></polygon>
             </svg>
           </div>
@@ -1202,10 +2015,18 @@
         thumbWrap.appendChild(overlay);
 
         if (video.id === activeVideoId) {
-          const badge = document.createElement('span');
-          badge.className = 'badge-now-playing';
-          badge.textContent = 'No Player';
-          thumbWrap.appendChild(badge);
+          const playingBadge = document.createElement('span');
+          playingBadge.className = 'badge-top-left';
+          playingBadge.textContent = 'No Player';
+          thumbWrap.appendChild(playingBadge);
+        }
+
+        if (video.playlistName && contextType === 'continue') {
+          const plChip = document.createElement('span');
+          plChip.className = 'badge-playlist-chip';
+          plChip.textContent = video.playlistName;
+          plChip.title = `Playlist: ${video.playlistName}`;
+          thumbWrap.appendChild(plChip);
         }
 
         if (video.duration > 0) {
@@ -1215,7 +2036,6 @@
           thumbWrap.appendChild(durBadge);
         }
 
-        // Barra vermelha de progresso na base da imagem
         if (pct > 0) {
           const track = document.createElement('div');
           track.className = 'progress-track';
@@ -1226,72 +2046,92 @@
           thumbWrap.appendChild(track);
         }
 
-        // Corpo do Cartão
+        // Corpo
         const body = document.createElement('div');
         body.className = 'card-body';
 
-        const topInfo = document.createElement('div');
+        const infoBlock = document.createElement('div');
         const titleEl = document.createElement('h3');
         titleEl.className = 'card-title';
         titleEl.textContent = video.title;
         titleEl.onclick = () => openVideoInCinema(video.id);
-        topInfo.appendChild(titleEl);
+        infoBlock.appendChild(titleEl);
+
+        if (video.author) {
+          const authorEl = document.createElement('div');
+          authorEl.className = 'card-author';
+          authorEl.textContent = video.author;
+          infoBlock.appendChild(authorEl);
+        }
 
         const metaRow = document.createElement('div');
         metaRow.className = 'card-meta-row';
-        metaRow.style.marginTop = '0.45rem';
 
-        if (shelfType === 'continue') {
-          const timeText = video.duration > 0
+        if (completed) {
+          metaRow.innerHTML = `<span>100% Concluído</span><span>${video.duration > 0 ? formatTime(video.duration) : 'Finalizado'}</span>`;
+        } else if (inProgress) {
+          const elapsedStr = video.duration > 0
             ? `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`
             : `Parou em ${formatTime(video.currentTime)}`;
-          const remText = formatRemainingText(video.currentTime, video.duration);
-          metaRow.innerHTML = `<span>${timeText}</span><span class="remaining-pill">${remText}</span>`;
-        } else if (shelfType === 'watchlist') {
-          metaRow.innerHTML = `<span>Não iniciado</span><span>${video.duration > 0 ? formatTime(video.duration) : 'Pronto para ver'}</span>`;
+          const remStr = formatRemainingText(video.currentTime, video.duration);
+          metaRow.innerHTML = `<span>${elapsedStr}</span><span class="remaining-pill">${remStr}</span>`;
         } else {
-          metaRow.innerHTML = `<span>100% Concluído</span><span>${video.duration > 0 ? formatTime(video.duration) : 'Finalizado'}</span>`;
+          metaRow.innerHTML = `<span>Não iniciado</span><span>${video.duration > 0 ? formatTime(video.duration) : 'Pronto'}</span>`;
         }
-        topInfo.appendChild(metaRow);
+        infoBlock.appendChild(metaRow);
 
-        // Botões de Ação do Cartão
+        // Botões de ação
         const actions = document.createElement('div');
         actions.className = 'card-actions';
 
-        const mainBtn = document.createElement('button');
-        mainBtn.type = 'button';
-        mainBtn.className = 'btn-card-primary';
+        const primaryBtn = document.createElement('button');
+        primaryBtn.type = 'button';
+        primaryBtn.className = 'btn-card-primary';
 
-        if (shelfType === 'continue') {
-          mainBtn.innerHTML = `
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+        if (completed) {
+          primaryBtn.innerHTML = `
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+            <span>Rever do início</span>
+          `;
+          primaryBtn.onclick = () => restartVideo(video.id, true);
+        } else if (inProgress) {
+          primaryBtn.innerHTML = `
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
             <span>Continuar (${formatTime(video.currentTime)})</span>
           `;
-          mainBtn.onclick = () => openVideoInCinema(video.id);
-        } else if (shelfType === 'watchlist') {
-          mainBtn.innerHTML = `
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
-            <span>Assistir Agora</span>
-          `;
-          mainBtn.onclick = () => openVideoInCinema(video.id);
+          primaryBtn.onclick = () => openVideoInCinema(video.id);
         } else {
-          mainBtn.innerHTML = `
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-            <span>Assistir novamente</span>
+          primaryBtn.innerHTML = `
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+            <span>Assistir</span>
           `;
-          mainBtn.onclick = () => restartVideo(video.id, true);
+          primaryBtn.onclick = () => openVideoInCinema(video.id);
+        }
+        actions.appendChild(primaryBtn);
+
+        // Botão Marcar como Concluído (se ainda não concluído)
+        if (!completed) {
+          const doneBtn = document.createElement('button');
+          doneBtn.type = 'button';
+          doneBtn.className = 'btn-card-icon success';
+          doneBtn.title = 'Marcar como concluído';
+          doneBtn.innerHTML = `
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          `;
+          doneBtn.onclick = () => markVideoAsCompleted(video.id);
+          actions.appendChild(doneBtn);
         }
 
-        actions.appendChild(mainBtn);
-
-        // Botão discreto de reiniciar (00:00) para vídeos em andamento ou concluídos
-        if (shelfType === 'continue' || shelfType === 'completed') {
+        // Botão Resetar Progresso (se iniciado ou concluído)
+        if (inProgress || completed) {
           const resetBtn = document.createElement('button');
           resetBtn.type = 'button';
           resetBtn.className = 'btn-card-icon';
-          resetBtn.title = 'Reiniciar progresso (00:00)';
+          resetBtn.title = 'Resetar progresso (00:00)';
           resetBtn.innerHTML = `
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="1 4 1 10 7 10"></polyline>
               <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
             </svg>
@@ -1300,79 +2140,158 @@
           actions.appendChild(resetBtn);
         }
 
-        // Botão discreto para remover da biblioteca
-        const removeBtn = document.createElement('button');
-        removeBtn.type = 'button';
-        removeBtn.className = 'btn-card-icon danger';
-        removeBtn.title = 'Remover da lista';
-        removeBtn.innerHTML = `
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        // Botão Remover Vídeo
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'btn-card-icon danger';
+        delBtn.title = 'Remover vídeo';
+        delBtn.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="3 6 5 6 21 6"></polyline>
             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
           </svg>
         `;
-        removeBtn.onclick = () => removeVideo(video.id);
-        actions.appendChild(removeBtn);
+        delBtn.onclick = () => removeVideo(video.id);
+        actions.appendChild(delBtn);
 
-        body.appendChild(topInfo);
+        body.appendChild(infoBlock);
         body.appendChild(actions);
-
         card.appendChild(thumbWrap);
         card.appendChild(body);
         return card;
       }
 
-      function renderShelves() {
-        const continueList = [];
-        const watchList = [];
-        const completedList = [];
+      function renderAll() {
+        renderFilterPills();
 
-        for (const item of library) {
-          if (isVideoCompleted(item)) {
-            completedList.push(item);
-          } else if (isVideoInProgress(item)) {
-            continueList.push(item);
-          } else {
-            watchList.push(item);
+        // Exibe banner de demonstração se houver vídeos de exemplo
+        const hasDemos = state.videos.some((v) => v.isDemo);
+        demoBanner.classList.toggle('visible', hasDemos);
+
+        // 1. Prateleira "Continuar Assistindo" (sempre no topo)
+        let continueVideos = state.videos.filter((v) => isVideoInProgress(v));
+        if (activeFilter.startsWith('playlist:')) {
+          const plId = activeFilter.replace('playlist:', '');
+          continueVideos = continueVideos.filter((v) => v.playlistId === plId);
+        }
+        continueVideos.sort((a, b) => (b.lastWatched || 0) - (a.lastWatched || 0));
+
+        sectionContinue.style.display = (activeFilter === 'completed') ? 'none' : 'flex';
+        countContinue.textContent = continueVideos.length;
+        shelfContinue.innerHTML = '';
+
+        if (continueVideos.length === 0) {
+          shelfContinue.innerHTML = `<div class="empty-shelf">Nenhum vídeo em andamento no momento. Dê play em qualquer título abaixo e o GlauTube salvará automaticamente onde você parou.</div>`;
+        } else {
+          continueVideos.forEach((v) => shelfContinue.appendChild(createVideoCard(v, 'continue')));
+        }
+
+        // 2. Prateleiras de Playlists Importadas
+        playlistsShelvesContainer.innerHTML = '';
+        const playlistIds = Object.keys(state.playlists);
+
+        if (activeFilter === 'all' || activeFilter.startsWith('playlist:')) {
+          const targetPlIds = activeFilter.startsWith('playlist:')
+            ? [activeFilter.replace('playlist:', '')]
+            : playlistIds;
+
+          for (const plId of targetPlIds) {
+            const plMeta = state.playlists[plId];
+            if (!plMeta) continue;
+
+            const plVideos = state.videos
+              .filter((v) => v.playlistId === plId)
+              .sort((a, b) => (a.playlistOrder ?? 0) - (b.playlistOrder ?? 0));
+
+            const section = document.createElement('section');
+            section.className = 'shelf-section';
+
+            const header = document.createElement('div');
+            header.className = 'shelf-header';
+
+            const titleGroup = document.createElement('div');
+            titleGroup.className = 'shelf-title-group';
+            titleGroup.innerHTML = `
+              <h2 class="shelf-title">Playlist: ${escapeHtml(plMeta.name)}</h2>
+              <span class="shelf-count">${plVideos.length} vídeos</span>
+            `;
+
+            const actionsGroup = document.createElement('div');
+            actionsGroup.className = 'shelf-actions';
+
+            const playFirstBtn = document.createElement('button');
+            playFirstBtn.type = 'button';
+            playFirstBtn.className = 'btn-ghost';
+            playFirstBtn.innerHTML = `
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+              <span>Continuar Playlist</span>
+            `;
+            playFirstBtn.onclick = () => playPlaylistFromNextUnfinished(plId);
+
+            const delPlBtn = document.createElement('button');
+            delPlBtn.type = 'button';
+            delPlBtn.className = 'btn-ghost danger';
+            delPlBtn.textContent = 'Excluir Playlist';
+            delPlBtn.onclick = () => deleteEntirePlaylist(plId);
+
+            actionsGroup.appendChild(playFirstBtn);
+            actionsGroup.appendChild(delPlBtn);
+
+            header.appendChild(titleGroup);
+            header.appendChild(actionsGroup);
+
+            const grid = document.createElement('div');
+            grid.className = 'cards-grid';
+            if (plVideos.length === 0) {
+              grid.innerHTML = `<div class="empty-shelf">Esta playlist está vazia.</div>`;
+            } else {
+              plVideos.forEach((v) => grid.appendChild(createVideoCard(v, 'playlist')));
+            }
+
+            section.appendChild(header);
+            section.appendChild(grid);
+            playlistsShelvesContainer.appendChild(section);
           }
         }
 
-        // Ordenar "Continuar Assistindo" e "Concluídos" pelo mais recente assistido
-        continueList.sort((a, b) => (b.lastWatched || 0) - (a.lastWatched || 0));
-        completedList.sort((a, b) => (b.lastWatched || 0) - (a.lastWatched || 0));
+        // 3. Prateleira "Minha Lista (Para Assistir)" — vídeos individuais não concluídos
+        const showWatchlist = activeFilter === 'all' || activeFilter === 'watchlist';
+        sectionWatchlist.style.display = showWatchlist ? 'flex' : 'none';
 
-        // Atualizar contadores
-        countContinue.textContent = continueList.length;
-        countWatchlist.textContent = watchList.length;
-        countCompleted.textContent = completedList.length;
+        if (showWatchlist) {
+          const standaloneVideos = state.videos.filter((v) => !v.playlistId && !isVideoCompleted(v));
+          countWatchlist.textContent = standaloneVideos.length;
+          shelfWatchlist.innerHTML = '';
 
-        // Renderizar Continuar Assistindo
-        shelfContinue.innerHTML = '';
-        if (continueList.length === 0) {
-          shelfContinue.innerHTML = `<div class="empty-shelf" style="grid-column: 1 / -1;">Nenhum vídeo em andamento no momento. Comece a assistir qualquer título abaixo e seu progresso aparecerá automaticamente aqui!</div>`;
-        } else {
-          continueList.forEach((v) => shelfContinue.appendChild(createVideoCardElement(v, 'continue')));
+          if (standaloneVideos.length === 0) {
+            shelfWatchlist.innerHTML = `<div class="empty-shelf">Nenhum vídeo individual aguardando na Minha Lista. Cole um link do YouTube acima para adicionar.</div>`;
+          } else {
+            standaloneVideos.forEach((v) => shelfWatchlist.appendChild(createVideoCard(v, 'watchlist')));
+          }
         }
 
-        // Renderizar Minha Lista
-        shelfWatchlist.innerHTML = '';
-        if (watchList.length === 0) {
-          shelfWatchlist.innerHTML = `<div class="empty-shelf" style="grid-column: 1 / -1;">Sua fila está vazia. Cole um link do YouTube na barra superior para adicionar novos vídeos.</div>`;
-        } else {
-          watchList.forEach((v) => shelfWatchlist.appendChild(createVideoCardElement(v, 'watchlist')));
-        }
+        // 4. Prateleira "Assistidos / Concluídos"
+        const showCompleted = activeFilter === 'all' || activeFilter === 'completed';
+        sectionCompleted.style.display = showCompleted ? 'flex' : 'none';
 
-        // Renderizar Assistidos Recentemente
-        shelfCompleted.innerHTML = '';
-        if (completedList.length === 0) {
-          shelfCompleted.innerHTML = `<div class="empty-shelf" style="grid-column: 1 / -1;">Você ainda não concluiu nenhum vídeo.</div>`;
-        } else {
-          completedList.forEach((v) => shelfCompleted.appendChild(createVideoCardElement(v, 'completed')));
+        if (showCompleted) {
+          const completedVideos = state.videos
+            .filter((v) => isVideoCompleted(v))
+            .sort((a, b) => (b.lastWatched || 0) - (a.lastWatched || 0));
+
+          countCompleted.textContent = completedVideos.length;
+          shelfCompleted.innerHTML = '';
+
+          if (completedVideos.length === 0) {
+            shelfCompleted.innerHTML = `<div class="empty-shelf">Nenhum vídeo concluído ainda.</div>`;
+          } else {
+            completedVideos.forEach((v) => shelfCompleted.appendChild(createVideoCard(v, 'completed')));
+          }
         }
       }
 
       // ======================================================================
-      // INTEGRAÇÃO COM A YOUTUBE IFRAME PLAYER API
+      // YOUTUBE IFRAME PLAYER API & SALVAMENTO AUTOMÁTICO A CADA 2 SEGUNDOS
       // ======================================================================
       function injectYouTubeApiScript() {
         if (window.YT && window.YT.Player) {
@@ -1381,8 +2300,8 @@
         }
         const tag = document.createElement('script');
         tag.src = 'https://www.youtube.com/iframe_api';
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        const firstScript = document.getElementsByTagName('script')[0];
+        firstScript.parentNode.insertBefore(tag, firstScript);
       }
 
       window.onYouTubeIframeAPIReady = function () {
@@ -1390,17 +2309,54 @@
         if (pendingVideoToPlay) {
           const { id, startSeconds } = pendingVideoToPlay;
           pendingVideoToPlay = null;
-          initOrLoadPlayer(id, startSeconds);
+          initOrLoadCinemaPlayer(id, startSeconds);
         }
       };
 
+      function getNextVideoInQueue(currentId) {
+        const current = state.videos.find((v) => v.id === currentId);
+        if (!current) return null;
+
+        // Se pertence a uma playlist, busca o próximo da mesma playlist
+        if (current.playlistId) {
+          const plVideos = state.videos
+            .filter((v) => v.playlistId === current.playlistId)
+            .sort((a, b) => (a.playlistOrder ?? 0) - (b.playlistOrder ?? 0));
+
+          const idx = plVideos.findIndex((v) => v.id === currentId);
+          if (idx !== -1 && idx + 1 < plVideos.length) {
+            return plVideos[idx + 1];
+          }
+        }
+
+        // Caso contrário, busca o próximo vídeo não concluído na biblioteca
+        const candidates = state.videos.filter((v) => v.id !== currentId && !isVideoCompleted(v));
+        return candidates.length > 0 ? candidates[0] : null;
+      }
+
+      function playPlaylistFromNextUnfinished(playlistId) {
+        const plVideos = state.videos
+          .filter((v) => v.playlistId === playlistId)
+          .sort((a, b) => (a.playlistOrder ?? 0) - (b.playlistOrder ?? 0));
+
+        if (plVideos.length === 0) return;
+
+        // Prioriza o último em andamento da playlist ou o primeiro não concluído
+        const inProg = plVideos
+          .filter((v) => isVideoInProgress(v))
+          .sort((a, b) => (b.lastWatched || 0) - (a.lastWatched || 0))[0];
+
+        const nextUnwatched = plVideos.find((v) => !isVideoCompleted(v));
+        const target = inProg || nextUnwatched || plVideos[0];
+        openVideoInCinema(target.id);
+      }
+
       function openVideoInCinema(videoId) {
-        const video = library.find((v) => v.id === videoId);
+        const video = state.videos.find((v) => v.id === videoId);
         if (!video) return;
 
-        // Salva imediatamente o progresso do vídeo anterior antes de trocar
         if (activeVideoId && activeVideoId !== videoId) {
-          syncCurrentPlaybackProgress(true);
+          syncPlaybackProgress(true);
         }
 
         activeVideoId = video.id;
@@ -1408,7 +2364,17 @@
         cinemaVideoTitle.textContent = video.title;
         cinemaStatusLabel.textContent = 'Carregando Player...';
 
-        // Se estava concluído e clicou no card, retoma do zero
+        if (video.playlistName) {
+          cinemaPlaylistTag.textContent = `Playlist: ${video.playlistName}`;
+          cinemaPlaylistTag.classList.add('visible');
+        } else {
+          cinemaPlaylistTag.classList.remove('visible');
+        }
+
+        const nextVid = getNextVideoInQueue(video.id);
+        btnNextInQueue.disabled = !nextVid;
+        btnNextInQueue.title = nextVid ? `Próximo: ${nextVid.title}` : 'Fim da fila';
+
         const startSeconds = isVideoCompleted(video) ? 0 : Math.floor(video.currentTime || 0);
         if (isVideoCompleted(video)) {
           video.completed = false;
@@ -1416,7 +2382,7 @@
         }
         video.lastWatched = Date.now();
         saveLibrary();
-        renderShelves();
+        renderAll();
 
         cinemaSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
@@ -1425,10 +2391,10 @@
           return;
         }
 
-        initOrLoadPlayer(video.id, startSeconds);
+        initOrLoadCinemaPlayer(video.id, startSeconds);
       }
 
-      function initOrLoadPlayer(videoId, startSeconds) {
+      function initOrLoadCinemaPlayer(videoId, startSeconds) {
         if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
           ytPlayer.loadVideoById({
             videoId: videoId,
@@ -1447,80 +2413,86 @@
             playsinline: 1
           },
           events: {
-            onReady: (event) => {
+            onReady: (ev) => {
               if (startSeconds > 0) {
-                event.target.seekTo(startSeconds, true);
+                ev.target.seekTo(startSeconds, true);
               }
-              event.target.playVideo();
+              ev.target.playVideo();
             },
             onStateChange: handlePlayerStateChange,
             onError: () => {
-              cinemaStatusLabel.textContent = 'Erro ao carregar vídeo';
-              showToast('Este vídeo não permite incorporação externa ou está indisponível.');
+              cinemaStatusLabel.textContent = 'Vídeo indisponível para incorporação';
+              showToast('Este vídeo bloqueia reprodução incorporada pelo autor.');
             }
           }
         });
       }
 
       function handlePlayerStateChange(event) {
-        const state = event.data;
+        const st = event.data;
 
-        if (state === YT.PlayerState.PLAYING) {
+        if (st === YT.PlayerState.PLAYING) {
           cinemaStatusLabel.textContent = 'Reproduzindo Agora';
-          syncCurrentPlaybackProgress(true);
-          startProgressAutoSaveInterval();
-        } else if (state === YT.PlayerState.PAUSED) {
+          syncPlaybackProgress(true);
+          startAutoSaveLoop();
+        } else if (st === YT.PlayerState.PAUSED) {
           cinemaStatusLabel.textContent = 'Pausado (Progresso Salvo)';
-          stopProgressAutoSaveInterval();
-          syncCurrentPlaybackProgress(true);
-        } else if (state === YT.PlayerState.ENDED) {
+          stopAutoSaveLoop();
+          syncPlaybackProgress(true);
+        } else if (st === YT.PlayerState.ENDED) {
           cinemaStatusLabel.textContent = 'Vídeo Concluído';
-          stopProgressAutoSaveInterval();
-          markVideoAsCompleted(activeVideoId);
-        } else if (state === YT.PlayerState.BUFFERING) {
+          stopAutoSaveLoop();
+          const finishedId = activeVideoId;
+          const nextVid = getNextVideoInQueue(finishedId);
+          markVideoAsCompleted(finishedId, false);
+
+          if (nextVid) {
+            showToast(`Concluído! Iniciando próximo: "${nextVid.title}"`);
+            openVideoInCinema(nextVid.id);
+          }
+        } else if (st === YT.PlayerState.BUFFERING) {
           cinemaStatusLabel.textContent = 'Carregando...';
         }
       }
 
-      function startProgressAutoSaveInterval() {
-        stopProgressAutoSaveInterval();
-        // Intervalo obrigatório de 2 segundos enquanto estiver tocando
+      function startAutoSaveLoop() {
+        stopAutoSaveLoop();
         progressSaveTimer = setInterval(() => {
-          syncCurrentPlaybackProgress(false);
+          syncPlaybackProgress(false);
         }, 2000);
       }
 
-      function stopProgressAutoSaveInterval() {
+      function stopAutoSaveLoop() {
         if (progressSaveTimer) {
           clearInterval(progressSaveTimer);
           progressSaveTimer = null;
         }
       }
 
-      function syncCurrentPlaybackProgress(forceRender = false) {
+      function syncPlaybackProgress(forceRender = false) {
         if (!activeVideoId || !ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') {
           return;
         }
 
-        const video = library.find((v) => v.id === activeVideoId);
+        const video = state.videos.find((v) => v.id === activeVideoId);
         if (!video) return;
 
         try {
-          const currentTime = ytPlayer.getCurrentTime();
-          const duration = ytPlayer.getDuration();
-          const videoData = typeof ytPlayer.getVideoData === 'function' ? ytPlayer.getVideoData() : null;
+          const cur = ytPlayer.getCurrentTime();
+          const dur = ytPlayer.getDuration();
+          const vData = typeof ytPlayer.getVideoData === 'function' ? ytPlayer.getVideoData() : null;
 
-          if (videoData && videoData.title && videoData.title.trim() !== '') {
-            video.title = videoData.title.trim();
+          if (vData && vData.title && vData.title.trim()) {
+            video.title = vData.title.trim();
             cinemaVideoTitle.textContent = video.title;
           }
 
-          if (typeof currentTime === 'number' && !isNaN(currentTime)) {
-            video.currentTime = Math.floor(currentTime);
+          if (typeof cur === 'number' && !isNaN(cur)) {
+            video.currentTime = Math.floor(cur);
           }
 
-          if (typeof duration === 'number' && duration > 0) {
-            video.duration = Math.floor(duration);
+          if (typeof dur === 'number' && dur > 0) {
+            video.duration = Math.floor(dur);
           }
 
           video.lastWatched = Date.now();
@@ -1531,146 +2503,173 @@
 
           saveLibrary();
 
-          const nowStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-          syncStatusText.querySelector('span').textContent = `Salvo automaticamente às ${nowStr} (${formatTime(video.currentTime)})`;
+          const timeLabel = new Date().toLocaleTimeString('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+          });
+          syncStatusText.querySelector('span').textContent = `Salvo automaticamente às ${timeLabel} (${formatTime(video.currentTime)})`;
 
           if (forceRender) {
-            renderShelves();
+            renderAll();
           }
-        } catch (err) {
-          console.warn('Falha momentânea ao ler estado do player:', err);
+        } catch (e) {
+          // Falha silenciosa durante transição do iframe
         }
       }
 
       function closeCinemaPlayer() {
-        syncCurrentPlaybackProgress(false);
-        stopProgressAutoSaveInterval();
+        syncPlaybackProgress(false);
+        stopAutoSaveLoop();
         if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
           ytPlayer.pauseVideo();
         }
         activeVideoId = null;
         cinemaSection.classList.remove('active');
-        renderShelves();
+        renderAll();
       }
 
       // ======================================================================
-      // AÇÕES DE GERENCIAMENTO DOS VÍDEOS
+      // OPERAÇÕES DE CARTÕES, PLAYLISTS E BACKUP JSON
       // ======================================================================
-      async function handleAddVideo(rawInput) {
-        const videoId = extractYouTubeId(rawInput);
-        if (!videoId) {
-          showToast('Link inválido. Cole uma URL do YouTube ou ID de 11 caracteres.');
-          return;
-        }
-
-        const existing = library.find((v) => v.id === videoId);
-        if (existing) {
-          urlInput.value = '';
-          showToast('Este vídeo já está na sua biblioteca! Abrindo...', 'Abrir', () => openVideoInCinema(videoId));
-          openVideoInCinema(videoId);
-          return;
-        }
-
-        urlInput.value = '';
-        showToast('Buscando informações do vídeo...');
-
-        const fetchedTitle = await fetchVideoTitleFromNoembed(videoId);
-
-        const newEntry = {
-          id: videoId,
-          title: fetchedTitle,
-          currentTime: 0,
-          duration: 0,
-          lastWatched: null,
-          completed: false
-        };
-
-        library.unshift(newEntry);
-        saveLibrary();
-        renderShelves();
-        showToast(`Adicionado à Minha Lista: "${fetchedTitle}"`, 'Assistir', () => openVideoInCinema(videoId));
-      }
-
-      function restartVideo(videoId, autoPlayAfter) {
-        const video = library.find((v) => v.id === videoId);
+      function restartVideo(videoId, autoPlay) {
+        const video = state.videos.find((v) => v.id === videoId);
         if (!video) return;
 
         video.currentTime = 0;
         video.completed = false;
-        video.lastWatched = autoPlayAfter ? Date.now() : null;
+        video.lastWatched = autoPlay ? Date.now() : null;
         saveLibrary();
-        renderShelves();
+        renderAll();
 
         if (activeVideoId === videoId && ytPlayer && typeof ytPlayer.seekTo === 'function') {
           ytPlayer.seekTo(0, true);
-          if (autoPlayAfter) ytPlayer.playVideo();
-        } else if (autoPlayAfter) {
+          if (autoPlay) ytPlayer.playVideo();
+        } else if (autoPlay) {
           openVideoInCinema(videoId);
         } else {
           showToast('Progresso reiniciado para 00:00.');
         }
       }
 
-      function markVideoAsCompleted(videoId) {
-        const video = library.find((v) => v.id === videoId);
+      function markVideoAsCompleted(videoId, notify = true) {
+        const video = state.videos.find((v) => v.id === videoId);
         if (!video) return;
 
         video.completed = true;
-        if (video.duration > 0) {
-          video.currentTime = video.duration;
-        }
+        if (video.duration > 0) video.currentTime = video.duration;
         video.lastWatched = Date.now();
         saveLibrary();
-        renderShelves();
-        showToast(`Marcado como concluído: "${video.title}"`);
+        renderAll();
+
+        if (notify) {
+          showToast(`Concluído: "${video.title}"`);
+        }
       }
 
       function removeVideo(videoId) {
-        const index = library.findIndex((v) => v.id === videoId);
-        if (index === -1) return;
+        const idx = state.videos.findIndex((v) => v.id === videoId);
+        if (idx === -1) return;
 
-        const [removed] = library.splice(index, 1);
-        lastDeletedBackup = { item: removed, index };
+        const [removed] = state.videos.splice(idx, 1);
+        undoBuffer = { type: 'video', item: removed, index: idx };
 
         if (activeVideoId === videoId) {
           closeCinemaPlayer();
         } else {
           saveLibrary();
-          renderShelves();
+          renderAll();
         }
 
-        saveLibrary();
         showToast(`"${removed.title}" removido.`, 'Desfazer', () => {
-          if (lastDeletedBackup) {
-            library.splice(lastDeletedBackup.index, 0, lastDeletedBackup.item);
-            lastDeletedBackup = null;
+          if (undoBuffer && undoBuffer.type === 'video') {
+            state.videos.splice(undoBuffer.index, 0, undoBuffer.item);
+            undoBuffer = null;
             saveLibrary();
-            renderShelves();
+            renderAll();
           }
         });
       }
 
-      // ======================================================================
-      // EXPORTAR E IMPORTAR BACKUP JSON
-      // ======================================================================
+      function deleteEntirePlaylist(playlistId) {
+        const plMeta = state.playlists[playlistId];
+        if (!plMeta) return;
+
+        const removedVideos = state.videos.filter((v) => v.playlistId === playlistId);
+        state.videos = state.videos.filter((v) => v.playlistId !== playlistId);
+        delete state.playlists[playlistId];
+
+        if (activeVideoId && removedVideos.some((v) => v.id === activeVideoId)) {
+          closeCinemaPlayer();
+        }
+
+        undoBuffer = {
+          type: 'playlist',
+          playlistId,
+          playlistMeta: plMeta,
+          videos: removedVideos
+        };
+
+        if (activeFilter === `playlist:${playlistId}`) {
+          activeFilter = 'all';
+        }
+
+        saveLibrary();
+        renderAll();
+
+        showToast(`Playlist "${plMeta.name}" (${removedVideos.length} vídeos) excluída.`, 'Desfazer', () => {
+          if (undoBuffer && undoBuffer.type === 'playlist') {
+            state.playlists[undoBuffer.playlistId] = undoBuffer.playlistMeta;
+            state.videos.push(...undoBuffer.videos);
+            undoBuffer = null;
+            saveLibrary();
+            renderAll();
+          }
+        });
+      }
+
+      function clearDemoVideos() {
+        const demos = state.videos.filter((v) => v.isDemo);
+        if (demos.length === 0) return;
+
+        state.videos = state.videos.filter((v) => !v.isDemo);
+        if (activeVideoId && demos.some((v) => v.id === activeVideoId)) {
+          closeCinemaPlayer();
+        }
+
+        undoBuffer = { type: 'demos', videos: demos };
+        saveLibrary();
+        renderAll();
+
+        showToast('Vídeos de exemplo removidos.', 'Desfazer', () => {
+          if (undoBuffer && undoBuffer.type === 'demos') {
+            state.videos.push(...undoBuffer.videos);
+            undoBuffer = null;
+            saveLibrary();
+            renderAll();
+          }
+        });
+      }
+
       function exportLibraryJson() {
-        syncCurrentPlaybackProgress(false);
+        syncPlaybackProgress(false);
         const payload = {
-          app: 'Meu Stream',
+          app: 'GlauTube',
+          version: 1,
           exportedAt: new Date().toISOString(),
-          videos: library
+          playlists: state.playlists,
+          videos: state.videos
         };
         const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        const dateStr = new Date().toISOString().slice(0, 10);
         a.href = url;
-        a.download = `meu-stream-backup-${dateStr}.json`;
+        a.download = `glautube-backup-${new Date().toISOString().slice(0, 10)}.json`;
         document.body.appendChild(a);
         a.click();
         a.remove();
         URL.revokeObjectURL(url);
-        showToast('Backup JSON exportado com sucesso!');
+        showToast('Backup JSON do GlauTube exportado com sucesso!');
       }
 
       function importLibraryJson(file) {
@@ -1679,37 +2678,46 @@
         reader.onload = (e) => {
           try {
             const parsed = JSON.parse(e.target.result);
-            const importedList = Array.isArray(parsed) ? parsed : parsed.videos;
+            const importedVideos = Array.isArray(parsed) ? parsed : parsed.videos;
+            const importedPlaylists = parsed && typeof parsed.playlists === 'object' ? parsed.playlists : {};
 
-            if (!Array.isArray(importedList)) {
-              throw new Error('Formato inválido');
+            if (!Array.isArray(importedVideos)) {
+              throw new Error('Estrutura JSON inválida');
             }
 
-            const validItems = importedList.filter((v) => v && typeof v.id === 'string' && v.id.length === 11);
-            if (validItems.length === 0) {
+            const validVideos = importedVideos.filter((v) => v && typeof v.id === 'string' && v.id.length === 11);
+            if (validVideos.length === 0) {
               showToast('Nenhum vídeo válido encontrado no arquivo JSON.');
               return;
             }
 
-            // Mescla mantendo os registros importados atualizados
-            const map = new Map(library.map((item) => [item.id, item]));
-            for (const item of validItems) {
-              map.set(item.id, {
+            // Mescla playlists
+            Object.assign(state.playlists, importedPlaylists);
+
+            // Mescla vídeos preservando os dados do backup
+            const videoMap = new Map(state.videos.map((v) => [v.id, v]));
+            for (const item of validVideos) {
+              videoMap.set(item.id, {
                 id: item.id,
                 title: item.title || `Vídeo (${item.id})`,
+                author: item.author || 'YouTube',
                 currentTime: Number(item.currentTime) || 0,
                 duration: Number(item.duration) || 0,
                 lastWatched: item.lastWatched || null,
-                completed: Boolean(item.completed)
+                completed: Boolean(item.completed),
+                playlistId: item.playlistId || null,
+                playlistName: item.playlistName || null,
+                playlistOrder: typeof item.playlistOrder === 'number' ? item.playlistOrder : 0,
+                isDemo: Boolean(item.isDemo)
               });
             }
 
-            library = Array.from(map.values());
+            state.videos = Array.from(videoMap.values());
             saveLibrary();
-            renderShelves();
-            showToast(`${validItems.length} vídeo(s) importado(s) com sucesso!`);
+            renderAll();
+            showToast(`${validVideos.length} vídeo(s) importados para o GlauTube!`);
           } catch (err) {
-            showToast('Erro ao ler o arquivo JSON. Verifique se é um backup válido.');
+            showToast('Falha ao importar JSON. Verifique se o arquivo é válido.');
           } finally {
             importFileInput.value = '';
           }
@@ -1718,28 +2726,80 @@
       }
 
       // ======================================================================
+      // NOTIFICAÇÕES TOAST
+      // ======================================================================
+      function showToast(message, actionLabel = null, actionCallback = null) {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+
+        const span = document.createElement('span');
+        span.textContent = message;
+        toast.appendChild(span);
+
+        if (actionLabel && typeof actionCallback === 'function') {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'toast-action';
+          btn.textContent = actionLabel;
+          btn.onclick = () => {
+            actionCallback();
+            toast.remove();
+          };
+          toast.appendChild(btn);
+        }
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+          if (toast.parentNode) {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.22s ease';
+            setTimeout(() => toast.remove(), 240);
+          }
+        }, 4500);
+      }
+
+      // ======================================================================
       // EVENT LISTENERS
       // ======================================================================
-      addForm.addEventListener('submit', (e) => {
+      urlInput.addEventListener('input', updateInputDetectionUI);
+
+      importForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        handleAddVideo(urlInput.value);
+        const parsed = parseYouTubeUrl(urlInput.value);
+
+        if (parsed.type === 'playlist') {
+          handleImportPlaylist(parsed.playlistId, playlistCustomNameInput.value.trim());
+        } else if (parsed.type === 'video') {
+          handleAddSingleVideo(parsed.videoId);
+        } else {
+          showToast('Link inválido. Cole uma URL de vídeo ou playlist do YouTube.');
+        }
       });
 
       document.getElementById('btn-paste-clipboard').addEventListener('click', async () => {
         try {
           if (!navigator.clipboard || !navigator.clipboard.readText) {
-            throw new Error('Clipboard API indisponível');
+            throw new Error('Sem acesso à área de transferência');
           }
-          const text = await navigator.clipboard.readText();
-          if (text && text.trim()) {
-            urlInput.value = text.trim();
-            handleAddVideo(text.trim());
+          const clip = await navigator.clipboard.readText();
+          if (clip && clip.trim()) {
+            urlInput.value = clip.trim();
+            updateInputDetectionUI();
+            const parsed = parseYouTubeUrl(clip.trim());
+            if (parsed.type === 'video') {
+              handleAddSingleVideo(parsed.videoId);
+            } else if (parsed.type === 'playlist') {
+              showToast('Playlist detectada! Dê um nome opcional ou clique em "Importar Playlist".');
+              playlistCustomNameInput.focus();
+            }
           } else {
             showToast('A área de transferência está vazia.');
           }
         } catch (err) {
           urlInput.focus();
-          showToast('Use Ctrl+V (ou toque e segure -> Colar) no campo de link.');
+          showToast('Cole o link manualmente no campo (Ctrl+V ou segure -> Colar).');
         }
       });
 
@@ -1747,18 +2807,16 @@
 
       document.getElementById('btn-skip-back').addEventListener('click', () => {
         if (ytPlayer && typeof ytPlayer.getCurrentTime === 'function') {
-          const target = Math.max(0, ytPlayer.getCurrentTime() - 15);
-          ytPlayer.seekTo(target, true);
-          syncCurrentPlaybackProgress(true);
+          ytPlayer.seekTo(Math.max(0, ytPlayer.getCurrentTime() - 15), true);
+          syncPlaybackProgress(true);
         }
       });
 
       document.getElementById('btn-skip-forward').addEventListener('click', () => {
         if (ytPlayer && typeof ytPlayer.getCurrentTime === 'function') {
           const dur = ytPlayer.getDuration() || Infinity;
-          const target = Math.min(dur, ytPlayer.getCurrentTime() + 15);
-          ytPlayer.seekTo(target, true);
-          syncCurrentPlaybackProgress(true);
+          ytPlayer.seekTo(Math.min(dur, ytPlayer.getCurrentTime() + 15), true);
+          syncPlaybackProgress(true);
         }
       });
 
@@ -1768,32 +2826,48 @@
 
       document.getElementById('btn-mark-completed').addEventListener('click', () => {
         if (activeVideoId) {
-          const idToComplete = activeVideoId;
-          closeCinemaPlayer();
-          markVideoAsCompleted(idToComplete);
+          const idDone = activeVideoId;
+          const nextVid = getNextVideoInQueue(idDone);
+          markVideoAsCompleted(idDone, true);
+          if (nextVid) {
+            openVideoInCinema(nextVid.id);
+          } else {
+            closeCinemaPlayer();
+          }
         }
       });
 
+      btnNextInQueue.addEventListener('click', () => {
+        if (!activeVideoId) return;
+        const nextVid = getNextVideoInQueue(activeVideoId);
+        if (nextVid) {
+          openVideoInCinema(nextVid.id);
+        } else {
+          showToast('Você já está no último vídeo da fila!');
+        }
+      });
+
+      document.getElementById('btn-clear-demos').addEventListener('click', clearDemoVideos);
       document.getElementById('btn-export-json').addEventListener('click', exportLibraryJson);
       document.getElementById('btn-import-json').addEventListener('click', () => importFileInput.click());
       importFileInput.addEventListener('change', (e) => importLibraryJson(e.target.files[0]));
 
-      // Salvamento imediato ao trocar de aba, minimizar no celular ou fechar navegador
+      // Garante salvamento imediato ao ocultar aba, trocar app no celular ou fechar navegador
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'hidden') {
-          syncCurrentPlaybackProgress(false);
+          syncPlaybackProgress(false);
         }
       });
 
       window.addEventListener('beforeunload', () => {
-        syncCurrentPlaybackProgress(false);
+        syncPlaybackProgress(false);
       });
 
       // ======================================================================
-      // INICIALIZAÇÃO
+      // INICIALIZAÇÃO DO GLAUTUBE
       // ======================================================================
       loadLibrary();
-      renderShelves();
+      renderAll();
       injectYouTubeApiScript();
     })();
   </script>
