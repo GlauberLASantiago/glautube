@@ -1,7 +1,7 @@
 {
   "app": "GlauTube",
   "version": 1,
-  "exportedAt": "2026-11-12T22:54:12.316Z",
+  "exportedAt": "2026-11-12T23:02:48.242Z",
   "playlists": {
     "PLMoWfilUvS4jFflIZ9bL7JcDA9JAFTP3W": {
       "id": "PLMoWfilUvS4jFflIZ9bL7JcDA9JAFTP3W",
@@ -202,6 +202,11 @@
       "id": "PLhQTgJ8wVv-nse_bNlRr4AGhY03YLj_am",
       "name": "💜 Lançamentos da Semana",
       "importedAt": 1794524048029
+    },
+    "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB": {
+      "id": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "name": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️",
+      "importedAt": 1794524567816
     }
   },
   "videos": [
@@ -15622,6 +15627,336 @@
       "completed": false,
       "playlistId": "PLhQTgJ8wVv-nse_bNlRr4AGhY03YLj_am",
       "playlistName": "💜 Lançamentos da Semana"
+    },
+    {
+      "id": "wzDJNxI0A7A",
+      "title": "A Lenda dos Heróis | Episódio 01 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2665,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "PSt6Y9KVVJE",
+      "title": "A Lenda dos Heróis | Episódio 02 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2506,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "Zt7wLoiwup4",
+      "title": "A Lenda dos Heróis | Episódio 03 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2618,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "svwwUDX5XQw",
+      "title": "A Lenda dos Heróis | Episódio 04 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2506,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "Kjrc7OYdPOE",
+      "title": "A Lenda dos Heróis | Episódio 05 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2555,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "cB3WhhuyqlI",
+      "title": "A Lenda dos Heróis | Episódio 06 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2665,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "UqOLKleQb6A",
+      "title": "A Lenda dos Heróis | Episódio 07 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2637,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "J4Ra3xFtguo",
+      "title": "A Lenda dos Heróis | Episódio 08 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2696,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "bs98ZPlL2Ok",
+      "title": "A Lenda dos Heróis | Episódio 09 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2759,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "ZOgo_oiEZ2E",
+      "title": "A Lenda dos Heróis | Episódio 10 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2685,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "IRgIFg2I17k",
+      "title": "A Lenda dos Heróis | Episódio 11 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2565,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "_GRIeDQIn_k",
+      "title": "A Lenda dos Heróis | Episódio 12 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2722,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "glxJ_Mxjs48",
+      "title": "A Lenda dos Heróis | Episódio 13 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2761,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "QQtPRUbYjWk",
+      "title": "A Lenda dos Heróis | Episódio 14 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2716,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "XsddVw-1730",
+      "title": "A Lenda dos Heróis | Episódio 15 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2729,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "rQ7AdhtlLZE",
+      "title": "A Lenda dos Heróis | Episódio 16 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2665,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "UwM09MWGuAM",
+      "title": "A Lenda dos Heróis | Episódio 17 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2651,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "lcBywQFliUg",
+      "title": "A Lenda dos Heróis | Episódio 18 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2132,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "LdgvZTJd4F8",
+      "title": "A Lenda dos Heróis | Episódio 19 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2730,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "v1aaoh4jwac",
+      "title": "A Lenda dos Heróis | Episódio 20 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2676,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "8g-faQ7yz7g",
+      "title": "A Lenda dos Heróis | Episódio 21 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2724,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "uTDK6HfdLqk",
+      "title": "A Lenda dos Heróis | Episódio 22 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2603,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "UkKmaGax-y0",
+      "title": "A Lenda dos Heróis | Episódio 23 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2751,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "QtAA8dA0Obo",
+      "title": "A Lenda dos Heróis | Episódio 24 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2683,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "guukNlxL18E",
+      "title": "A Lenda dos Heróis | Episódio 25 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2626,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "IAO8dQpP4LE",
+      "title": "A Lenda dos Heróis | Episódio 26 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2744,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "N-WqBrK_B-Y",
+      "title": "A Lenda dos Heróis | Episódio 27 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2804,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "SEuzzs3cn2k",
+      "title": "A Lenda dos Heróis | Episódio 28 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2662,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "UKdITQOK0sY",
+      "title": "A Lenda dos Heróis | Episódio 29 Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2631,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
+    },
+    {
+      "id": "BP3_OCDoQVI",
+      "title": "A Lenda dos Heróis | Episódio 30 Final Completo | (The Legend of Heroes)｜WeTV",
+      "author": "WeTV Portuguese - Get the WeTV APP",
+      "currentTime": 0,
+      "duration": 2758,
+      "lastWatched": null,
+      "completed": false,
+      "playlistId": "PL_cslNq0e0_VyCxk71TYPDGF42vBsI-ZB",
+      "playlistName": "[COMPLETO] A Lenda dos Heróis | The Legend of Heroes ⚔️ Assista Completo no WeTV App ⚔️"
     }
   ]
 }
