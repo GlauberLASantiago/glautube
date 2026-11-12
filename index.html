@@ -3486,11 +3486,36 @@
       });
 
       // ======================================================================
+      // PWA: manifest.json + registro do Service Worker (sw.js)
+      // ======================================================================
+      function pwa() {
+        if (!document.querySelector('link[rel="manifest"]')) {
+          const link = document.createElement('link');
+          link.rel = 'manifest';
+          link.href = 'manifest.json';
+          document.head.appendChild(link);
+        }
+        if (!document.querySelector('meta[name="theme-color"]')) {
+          const meta = document.createElement('meta');
+          meta.name = 'theme-color';
+          meta.content = '#E50914';
+          document.head.appendChild(meta);
+        }
+
+        if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch((err) => console.warn('PWA: falha ao registrar o Service Worker', err));
+          });
+        }
+      }
+
+      // ======================================================================
       // 10. INICIALIZAÇÃO DO GLAUTUBE
       // ======================================================================
       loadLibrary();
       renderAll();
       injectYouTubeApiScript();
+      pwa();
     })();
   </script>
 </body>
