@@ -469,6 +469,28 @@
       border: 0;
     }
 
+    /* Tela cheia: o iframe (posição absoluta no box 16:9) precisa preencher o viewport */
+    .player-aspect-box iframe:fullscreen,
+    .player-aspect-box iframe:-webkit-full-screen,
+    #yt-player-mount:fullscreen {
+      position: fixed !important;
+      inset: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      max-width: none !important;
+      background: #000;
+    }
+
+    .player-aspect-box:fullscreen,
+    .player-aspect-box:-webkit-full-screen {
+      padding-top: 0;
+      width: 100vw;
+      height: 100vh;
+      border: 0;
+      border-radius: 0;
+    }
+
     .cinema-controls {
       margin-top: 0.95rem;
       display: flex;
@@ -3041,7 +3063,8 @@
             start: startSeconds,
             rel: 0,
             modestbranding: 1,
-            playsinline: 1
+            playsinline: 1,
+            fs: 1
           },
           events: {
             onReady: (ev) => {
