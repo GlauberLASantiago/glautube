@@ -8,12 +8,15 @@ const script = html.match(/<script>\s*(\(function \(\) \{[\s\S]*?\}\)\(\);)\s*<\
 const seed = JSON.parse(fs.readFileSync('glautube-banco-inicial.json', 'utf8'));
 const storageKey = 'glautube_library_v1';
 
-function startApp(storage, fetchImpl) {
+function startApp(storage, fetchImpl, yt) {
   const elements = new Map();
   function element() {
     return {
       classList: { add() {}, remove() {}, toggle() {} },
-      style: {}, appendChild() {}, setAttribute() {}, addEventListener() {},
+      style: {}, children: [], listeners: {},
+      appendChild(child) { this.children.push(child); },
+      setAttribute() {},
+      addEventListener(name, callback) { this.listeners[name] = callback; },
       parentNode: { insertBefore() {} }
     };
   }
@@ -27,14 +30,14 @@ function startApp(storage, fetchImpl) {
     addEventListener() {}
   };
   const context = {
-    document, window: { addEventListener() {} }, URL,
+    document, window: { YT: yt, addEventListener() {} }, URL,
     localStorage: {
       getItem: (key) => storage.get(key) || null,
       setItem: (key, value) => storage.set(key, value)
     },
     fetch: fetchImpl,
     console: { warn() {}, error() {} },
-    setTimeout() {}, setInterval() {}, clearInterval() {}
+    setTimeout() {}, clearTimeout() {}, setInterval() {}, clearInterval() {}
   };
   vm.runInNewContext(script, context);
   return elements;
@@ -99,4 +102,100 @@ test('tenta o GitHub se o arquivo local falhar e repete após falha total', asyn
   assert.match(retries[1], /^https:\/\/raw\.githubusercontent\.com\//);
   assert.equal(saved(storage).videos.length, seed.videos.length);
   assert.equal(saved(storage).seedInitialized, true);
+});
+
+function fakeYouTube(ids, fail = false) {
+  const instances = [];
+  function Player(mount, options) {
+    const player = this;
+    player.cuePlaylist = (request) => {
+      player.request = request;
+      setImmediate(() => fail
+        ? options.events.onError({ target: player })
+        : options.events.onStateChange({ data: 5, target: player }));
+    };
+    player.getPlaylist = () => ids;
+    player.destroy = () => { player.destroyed = true; };
+    instances.push(player);
+    setImmediate(() => options.events.onReady({ target: player }));
+  }
+  return { Player, PlayerState: { CUED: 5 }, instances };
+}
+
+function submitPlaylist(elements, id, name) {
+  elements.get('youtube-url-input').value = `https://www.youtube.com/playlist?list=${id}`;
+  elements.get('playlist-custom-name').value = name;
+  elements.get('import-form').listeners.submit({ preventDefault() {} });
+}
+
+test('importa playlist pelo player e preserva progresso de vídeos existentes', async () => {
+  const video = { ...seed.videos[0], playlistId: null, currentTime: 123 };
+  const storage = new Map([[storageKey, JSON.stringify({
+    videos: [video], playlists: {}, seedInitialized: true
+  })]]);
+  const yt = fakeYouTube([video.id, 'tl80gaCiglo']);
+  const elements = startApp(storage, success, yt);
+  submitPlaylist(elements, 'PLtest123', 'Minha coleção');
+  await flush();
+  await flush();
+  await flush();
+  const result = saved(storage);
+  assert.equal(yt.instances[0].request.list, 'PLtest123');
+  assert.equal(yt.instances[0].destroyed, true);
+  assert.equal(result.playlists.PLtest123.name, 'Minha coleção');
+  assert.equal(result.videos.length, 2);
+  assert.equal(result.videos[0].currentTime, 123);
+  assert.equal(result.videos[0].playlistId, 'PLtest123');
+  assert.equal(result.videos[1].playlistOrder, 1);
+  assert.equal(elements.get('btn-submit-import').disabled, false);
+});
+
+test('falha de playlist não altera biblioteca e libera nova tentativa', async () => {
+  const storage = new Map([[storageKey, JSON.stringify({
+    videos: [], playlists: {}, seedInitialized: true
+  })]]);
+  const yt = fakeYouTube([], true);
+  const elements = startApp(storage, success, yt);
+  submitPlaylist(elements, 'PLprivada', 'Privada');
+  await flush();
+  await flush();
+  await flush();
+  assert.equal(saved(storage).videos.length, 0);
+  assert.deepEqual(saved(storage).playlists, {});
+  assert.equal(elements.get('btn-submit-import').disabled, false);
+  assert.equal(yt.instances[0].destroyed, true);
+  assert.match(elements.get('toast-container').children.at(-1).children[0].textContent, /Não foi possível acessar/);
+});
+
+test('não altera vídeos de outra playlist e informa os itens ignorados', async () => {
+  const video = { ...seed.videos[3], currentTime: 50 };
+  const storage = new Map([[storageKey, JSON.stringify({
+    videos: [video], playlists: seed.playlists, seedInitialized: true
+  })]]);
+  const yt = fakeYouTube([video.id, '12345678901']);
+  const elements = startApp(storage, success, yt);
+  submitPlaylist(elements, 'PLnova', 'Nova');
+  await flush();
+  await flush();
+  await flush();
+  const result = saved(storage);
+  assert.equal(result.videos[0].playlistId, video.playlistId);
+  assert.equal(result.videos[0].currentTime, 50);
+  assert.equal(result.videos[1].playlistId, 'PLnova');
+  assert.match(elements.get('toast-container').children.at(-1).children[0].textContent, /1 vídeo\(s\).*outra playlist/);
+});
+
+test('não cria playlist quando o YouTube não fornece IDs válidos', async () => {
+  const storage = new Map([[storageKey, JSON.stringify({
+    videos: [], playlists: {}, seedInitialized: true
+  })]]);
+  const yt = fakeYouTube(['inválido']);
+  const elements = startApp(storage, success, yt);
+  submitPlaylist(elements, 'PLvazia', 'Vazia');
+  await flush();
+  await flush();
+  await flush();
+  assert.deepEqual(saved(storage).playlists, {});
+  assert.equal(elements.get('btn-submit-import').disabled, false);
+  assert.match(elements.get('toast-container').children.at(-1).children[0].textContent, /não contém vídeos válidos/);
 });
