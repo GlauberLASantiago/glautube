@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <title>GlauTube — Seu Streaming Pessoal</title>
   <!-- Favicon SVG personalizado do GlauTube (botão play vermelho estilizado) -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23ff1e27'/%3E%3Cstop offset='100%25' stop-color='%23b80710'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='%23141414'/%3E%3Crect x='3' y='3' width='58' height='58' rx='12' fill='none' stroke='%23E50914' stroke-width='2.5' stroke-opacity='0.45'/%3E%3Cpath d='M22 16L48 32L22 48V16Z' fill='url(%23g)'/%3E%3Crect x='16' y='52' width='32' height='3.5' rx='1.75' fill='%23E50914'/%3E%3C/svg%3E" />
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23ff1e27'/%3E%3Cstop offset='100%25' stop-color='%23b80710'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='%23141414'/%3E%3Crect x='3' y='3' width='58' height='58' rx='12' fill='none' stroke='%23E50914' stroke-width='2.5' stroke-opacity='0.45'/%3E%3Cpath d='M22 16L48 32L22 48V16Z' fill='url(%23g)'/%3E%3Crect x='16' y='52' width='32' height='3.5' rx='1.75' fill='%23E50914'/%3E%3C/svg%3E" />
 
   <style>
     /* ==========================================================================
@@ -54,7 +60,8 @@
       overflow-x: hidden;
     }
 
-    button, input {
+    button,
+    input {
       font-family: inherit;
       color: inherit;
     }
@@ -346,6 +353,232 @@
       border-color: var(--border-strong);
     }
 
+    /* ==========================================================================
+       MENU DE PERFIL / CONFIGURAÇÕES ESTILO NETFLIX
+       ========================================================================== */
+    .netflix-menu-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .netflix-profile-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      padding: 0.25rem 0.35rem;
+      cursor: pointer;
+      color: var(--text-primary);
+      transition: all var(--transition);
+      position: relative;
+    }
+
+    .netflix-profile-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--border-subtle);
+    }
+
+    .netflix-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #E50914 0%, #8b0710 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .netflix-caret {
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      transition: transform 0.2s ease;
+    }
+
+    .netflix-profile-btn[aria-expanded="true"] .netflix-caret {
+      transform: rotate(180deg);
+    }
+
+    .netflix-badge-dot {
+      position: absolute;
+      top: 1px;
+      right: 1px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+      border: 2px solid var(--bg-primary);
+      box-shadow: 0 0 6px rgba(74, 222, 128, 0.7);
+    }
+
+    .netflix-dropdown-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 270px;
+      background: rgba(22, 22, 22, 0.98);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: var(--radius-md);
+      box-shadow: 0 16px 42px rgba(0, 0, 0, 0.88);
+      padding: 0.6rem;
+      z-index: 1000;
+      animation: dropdownFade 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .netflix-dropdown-menu.active {
+      display: block;
+    }
+
+    @keyframes dropdownFade {
+      from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .dropdown-header {
+      padding: 0.5rem 0.6rem 0.65rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 0.45rem;
+    }
+
+    .dropdown-user-name {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .dropdown-user-status {
+      display: block;
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      margin-top: 0.15rem;
+    }
+
+    .dropdown-section-title {
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      padding: 0.35rem 0.6rem 0.2rem;
+    }
+
+    .dropdown-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.58rem 0.65rem;
+      border: none;
+      background: transparent;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      text-align: left;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all var(--transition);
+    }
+
+    .dropdown-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+    }
+
+    .dropdown-item-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      flex-shrink: 0;
+    }
+
+    .dropdown-item:hover .dropdown-item-icon {
+      background: rgba(229, 9, 20, 0.2);
+      color: var(--accent-red);
+    }
+
+    .dropdown-item-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .dropdown-item-title {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .dropdown-item-sub {
+      display: block;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 0.1rem;
+    }
+
+    .dropdown-install-box {
+      margin-bottom: 0.45rem;
+    }
+
+    .dropdown-item.install-accent {
+      background: rgba(229, 9, 20, 0.12);
+      border: 1px solid rgba(229, 9, 20, 0.35);
+      color: #fff;
+    }
+
+    .dropdown-item.install-accent:hover {
+      background: var(--accent-red);
+      border-color: var(--accent-red);
+    }
+
+    .dropdown-item.install-accent:hover .dropdown-item-icon {
+      background: rgba(0, 0, 0, 0.3);
+      color: #fff;
+    }
+
+    .install-pill {
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      background: var(--accent-red);
+      color: #fff;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+
+    .dropdown-item.install-accent:hover .install-pill {
+      background: #ffffff;
+      color: var(--accent-red);
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+      margin: 0.4rem 0.2rem;
+    }
+
+    .dropdown-footer {
+      padding: 0.45rem 0.6rem 0.2rem;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      text-align: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      margin-top: 0.35rem;
+    }
+
     .btn-ghost.danger:hover {
       background: rgba(229, 9, 20, 0.18);
       border-color: rgba(229, 9, 20, 0.45);
@@ -368,8 +601,15 @@
     }
 
     @keyframes fadeSlide {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .cinema-wrapper {
@@ -421,9 +661,17 @@
     }
 
     @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(229, 9, 20, 0.75); }
-      70% { box-shadow: 0 0 0 8px rgba(229, 9, 20, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(229, 9, 20, 0); }
+      0% {
+        box-shadow: 0 0 0 0 rgba(229, 9, 20, 0.75);
+      }
+
+      70% {
+        box-shadow: 0 0 0 8px rgba(229, 9, 20, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(229, 9, 20, 0);
+      }
     }
 
     .cinema-playlist-tag {
@@ -467,6 +715,101 @@
       width: 100%;
       height: 100%;
       border: 0;
+    }
+
+    /* Regras de Tela Cheia com Fit-to-Screen Estrito (evita estouro e zoom em tablets e celulares) */
+    .player-aspect-box:fullscreen,
+    .player-aspect-box:-webkit-full-screen,
+    .player-aspect-box.is-fullscreen {
+      position: fixed !important;
+      inset: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      max-width: 100vw !important;
+      max-height: 100vh !important;
+      max-height: 100dvh !important;
+      padding-top: 0 !important;
+      margin: 0 !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      background: #000 !important;
+      z-index: 9999999 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      overflow: hidden !important;
+    }
+
+    .player-aspect-box:fullscreen iframe,
+    .player-aspect-box:-webkit-full-screen iframe,
+    .player-aspect-box.is-fullscreen iframe,
+    .player-aspect-box:fullscreen #yt-player-mount,
+    .player-aspect-box:-webkit-full-screen #yt-player-mount,
+    .player-aspect-box.is-fullscreen #yt-player-mount {
+      position: relative !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-width: calc(100vh * 16 / 9) !important;
+      max-height: calc(100vw * 9 / 16) !important;
+      max-width: calc(100dvh * 16 / 9) !important;
+      max-height: calc(100dvw * 9 / 16) !important;
+      aspect-ratio: 16 / 9 !important;
+      object-fit: contain !important;
+      margin: auto !important;
+      inset: auto !important;
+      border: 0 !important;
+    }
+
+    iframe:fullscreen,
+    iframe:-webkit-full-screen {
+      width: 100vw !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      max-width: 100vw !important;
+      max-height: 100vh !important;
+      max-height: 100dvh !important;
+      object-fit: contain !important;
+      background: #000 !important;
+      inset: 0 !important;
+      margin: auto !important;
+    }
+
+    body.player-in-fullscreen {
+      overflow: hidden !important;
+    }
+
+    .btn-exit-fullscreen {
+      display: none;
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      z-index: 10000000;
+      background: rgba(18, 18, 18, 0.85);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 0.55rem 0.95rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.83rem;
+      font-weight: 600;
+      cursor: pointer;
+      align-items: center;
+      gap: 0.45rem;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.75);
+      transition: all var(--transition);
+    }
+
+    .btn-exit-fullscreen:hover {
+      background: var(--accent-red);
+      border-color: var(--accent-red-hover);
+    }
+
+    .player-aspect-box:fullscreen .btn-exit-fullscreen,
+    .player-aspect-box:-webkit-full-screen .btn-exit-fullscreen,
+    .player-aspect-box.is-fullscreen .btn-exit-fullscreen {
+      display: inline-flex;
     }
 
     .cinema-controls {
@@ -675,6 +1018,31 @@
       color: #ffffff;
     }
 
+    .sidebar-rename-pl-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      opacity: 1;
+      flex-shrink: 0;
+      transition: all var(--transition);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+    }
+
+    .sidebar-item-row:hover .sidebar-rename-pl-btn {
+      opacity: 1;
+    }
+
+    .sidebar-rename-pl-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+    }
+
     .sidebar-delete-pl-btn {
       width: 28px;
       height: 28px;
@@ -829,7 +1197,9 @@
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     /* Prateleira */
@@ -1148,6 +1518,107 @@
       color: #ff6b72;
     }
 
+    .sidebar-import-zone {
+      flex: none;
+      max-width: none;
+      width: 100%;
+    }
+
+    .sidebar-import-zone .btn-label-desktop {
+      display: inline !important;
+    }
+
+    .sidebar-import-zone .add-input {
+      font-size: 0.82rem;
+      padding: 0.5rem 0.55rem;
+    }
+
+    .sidebar-import-zone .add-bar {
+      flex-wrap: wrap;
+      gap: 0.3rem;
+    }
+
+    .sidebar-import-zone .btn-primary {
+      flex: 1 1 100%;
+      justify-content: center;
+    }
+
+    /* Estado "Assistido" (marcação manual, estilo vermelho) */
+    .video-card.is-watched {
+      border-color: rgba(229, 9, 20, 0.55);
+    }
+
+    .btn-card-icon.watched,
+    .btn-card-icon.watched:hover {
+      background: var(--accent-red);
+      color: #fff;
+    }
+
+    .btn-control.watched,
+    .btn-control.watched:hover:not(:disabled) {
+      background: var(--accent-red);
+      color: #fff;
+    }
+
+    .badge-watched {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: var(--accent-red);
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 0.18rem 0.5rem;
+      border-radius: 4px;
+      z-index: 3;
+    }
+
+    .playlist-menu {
+      position: fixed;
+      z-index: 2000;
+      min-width: 190px;
+      background: rgba(22, 22, 22, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: var(--radius-md);
+      box-shadow: 0 16px 42px rgba(0, 0, 0, 0.88);
+      padding: 0.4rem;
+      animation: dropdownFade 0.15s ease;
+    }
+
+    .playlist-menu-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.6rem 0.7rem;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 0.84rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .playlist-menu-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .playlist-menu-item.danger {
+      color: #ff7b82;
+    }
+
+    .playlist-menu-item.danger:hover {
+      background: rgba(229, 9, 20, 0.2);
+    }
+
+    .playlist-menu-sep {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+      margin: 0.3rem 0.2rem;
+    }
+
     .empty-shelf {
       grid-column: 1 / -1;
       background: rgba(255, 255, 255, 0.025);
@@ -1217,8 +1688,15 @@
     }
 
     @keyframes toastIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* Container Oculto para Extração de Playlist via YouTube IFrame API */
@@ -1271,26 +1749,32 @@
         order: 3;
         flex: 1 1 100%;
       }
+
       .btn-label-desktop {
         display: none;
       }
+
       .cards-grid {
         grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
         gap: 0.95rem;
       }
+
       .cinema-controls {
         flex-direction: column;
         align-items: stretch;
       }
+
       .control-group {
         justify-content: center;
       }
+
       .sync-status {
         justify-content: center;
       }
     }
   </style>
 </head>
+
 <body>
   <!-- ========================================================================
        CABEÇALHO FIXO GLAUTUBE
@@ -1299,7 +1783,8 @@
     <div class="header-inner">
       <div style="display: flex; align-items: center; gap: 0.65rem;">
         <button type="button" id="btn-mobile-sidebar" class="mobile-menu-toggle" aria-label="Abrir menu de playlists">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round">
             <line x1="3" y1="6" x2="21" y2="6"></line>
             <line x1="3" y1="12" x2="21" y2="12"></line>
             <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -1326,81 +1811,55 @@
         </a>
       </div>
 
-      <!-- Zona Unificada de Importação (Vídeo Individual ou Playlist Completa) -->
-      <div class="import-zone">
-        <form id="import-form" class="add-bar" autocomplete="off">
-          <span id="detected-type-pill" class="type-pill">Playlist</span>
-          <input
-            type="text"
-            id="youtube-url-input"
-            class="add-input"
-            placeholder="Cole link de vídeo ou playlist do YouTube (watch, youtu.be, playlist?list=...)..."
-            aria-label="Link de vídeo ou playlist do YouTube"
-          />
-          <button type="button" id="btn-paste-clipboard" class="btn-inline" title="Colar da área de transferência">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+      <!-- Menu de Perfil e Configurações Estilo Netflix (Recolhível) -->
+      <div class="netflix-menu-wrapper" id="netflix-menu-wrapper">
+        <button type="button" id="btn-netflix-menu" class="netflix-profile-btn" aria-label="Menu de Configurações e Perfil" aria-expanded="false" title="Menu GlauTube">
+          <div class="netflix-avatar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
             </svg>
-            <span class="btn-label-desktop">Colar</span>
-          </button>
-          <button type="submit" id="btn-submit-import" class="btn-primary">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
+          </div>
+          <span class="netflix-caret">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
-            <span id="btn-submit-label">Adicionar</span>
-          </button>
-        </form>
+          </span>
+          <span id="netflix-install-badge-dot" class="netflix-badge-dot" style="display: none;" title="Instalação do app disponível"></span>
+        </button>
 
-        <!-- Nome Opcional da Playlist (exibido automaticamente quando list= é detectado) -->
-        <div id="playlist-name-row" class="playlist-name-row">
-          <span class="playlist-name-label">Playlist detectada:</span>
-          <input
-            type="text"
-            id="playlist-custom-name"
-            class="playlist-name-input"
-            placeholder="Nome opcional da coleção (ex: Filmes Clássicos, Curso Python)..."
-          />
+        <div id="netflix-dropdown-menu" class="netflix-dropdown-menu" role="menu">
+          <div class="dropdown-header">
+            <div class="dropdown-user-info">
+              <span class="dropdown-user-name">GlauTube Streaming</span>
+              <span class="dropdown-user-status" id="dropdown-pwa-status">Modo Navegador Web</span>
+            </div>
+          </div>
+
+          <!-- Opção de Instalar PWA (exibida apenas quando não estiver instalado) -->
+          <div id="dropdown-install-item" class="dropdown-install-box" style="display: none;">
+            <button type="button" id="btn-dropdown-install" class="dropdown-item install-accent" role="menuitem">
+              <div class="dropdown-item-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="2" width="16" height="20" rx="3" ry="3"></rect>
+                  <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                  <polyline points="9 10 12 13 15 10"></polyline>
+                  <line x1="12" y1="6" x2="12" y2="13"></line>
+                </svg>
+              </div>
+              <div class="dropdown-item-text">
+                <span class="dropdown-item-title">Instalar Aplicativo</span>
+                <span class="dropdown-item-sub">Abrir como App de Streaming</span>
+              </div>
+              <span class="install-pill">Grátis</span>
+            </button>
+          </div>
+
+          <div class="dropdown-footer">
+            <span>GlauTube v2.0 • Streaming Pessoal</span>
+          </div>
         </div>
 
-        <!-- Feedback Visual de Progresso ao Importar Playlist -->
-        <div id="import-progress-box" class="import-progress-box" aria-live="polite">
-          <div class="import-progress-top">
-            <span id="import-progress-label">Extraindo vídeos da playlist...</span>
-            <span id="import-progress-percent">0%</span>
-          </div>
-          <div class="import-bar-track">
-            <div id="import-bar-fill" class="import-bar-fill"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Backup JSON (Exportar / Importar) -->
-      <div class="header-actions">
-        <button type="button" id="btn-reload-seed-top" class="btn-ghost" title="Sincronizar catálogo inicial do GitHub">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="23 4 23 10 17 10"></polyline>
-            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-          </svg>
-          <span class="btn-label-desktop">Banco Inicial</span>
-        </button>
-        <button type="button" id="btn-export-json" class="btn-ghost" title="Exportar backup JSON">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-          </svg>
-          <span class="btn-label-desktop">Exportar JSON</span>
-        </button>
-        <button type="button" id="btn-import-json" class="btn-ghost" title="Importar backup JSON">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="17 8 12 3 7 8"></polyline>
-            <line x1="12" y1="3" x2="12" y2="15"></line>
-          </svg>
-          <span class="btn-label-desktop">Importar JSON</span>
-        </button>
         <input type="file" id="import-file-input" accept="application/json,.json" hidden />
       </div>
     </div>
@@ -1417,8 +1876,10 @@
     <aside id="left-sidebar" class="left-sidebar" aria-label="Navegação e Playlists">
       <div class="sidebar-top-sections">
         <div class="mobile-sidebar-header">
-          <span class="brand-name" style="font-size: 1.15rem;"><span class="glau">GLAU</span><span class="tube">TUBE</span></span>
-          <button type="button" id="btn-close-mobile-sidebar" class="btn-ghost" style="padding: 0.35rem 0.6rem;">Fechar</button>
+          <span class="brand-name" style="font-size: 1.15rem;"><span class="glau">GLAU</span><span
+              class="tube">TUBE</span></span>
+          <button type="button" id="btn-close-mobile-sidebar" class="btn-ghost"
+            style="padding: 0.35rem 0.6rem;">Fechar</button>
         </div>
 
         <!-- Seção 1: Navegação Geral -->
@@ -1435,31 +1896,81 @@
             <span class="sidebar-section-title">Minhas Playlists</span>
             <span id="sidebar-playlists-total" class="sidebar-count">0</span>
           </div>
-          <div id="sidebar-playlists-list" class="sidebar-playlists-list" role="navigation" aria-label="Lista de Playlists"></div>
+          <div id="sidebar-playlists-list" class="sidebar-playlists-list" role="navigation"
+            aria-label="Lista de Playlists"></div>
         </div>
       </div>
 
       <!-- Ações Rápidas no Rodapé da Sidebar -->
       <div class="sidebar-footer-actions">
-        <button type="button" id="btn-sidebar-quick-import" class="btn-sidebar-action primary">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          <span>+ Nova Playlist / Vídeo</span>
-        </button>
-        <button type="button" id="btn-sidebar-restore-seed" class="btn-sidebar-action secondary">
+        <button type="button" id="btn-sidebar-install-pwa" class="btn-sidebar-action secondary" title="Instalar GlauTube como aplicativo" style="display: none; border-color: rgba(229, 9, 20, 0.45); color: #ff858c;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="2" width="16" height="20" rx="3" ry="3"></rect>
+            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+            <polyline points="9 10 12 13 15 10"></polyline>
+            <line x1="12" y1="6" x2="12" y2="13"></line>
+          </svg>
+          <span>Instalar Aplicativo (PWA)</span>
+        </button>
+      <!-- Zona Unificada de Importação (Vídeo Individual ou Playlist Completa) -->
+      <div class="import-zone sidebar-import-zone">
+        <form id="import-form" class="add-bar" autocomplete="off">
+          <span id="detected-type-pill" class="type-pill">Playlist</span>
+          <input type="text" id="youtube-url-input" class="add-input"
+            placeholder="Cole link de vídeo ou playlist..."
+            aria-label="Link de vídeo ou playlist do YouTube" />
+          <button type="button" id="btn-paste-clipboard" class="btn-inline" title="Colar da área de transferência">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span class="btn-label-desktop">Colar</span>
+          </button>
+          <button type="submit" id="btn-submit-import" class="btn-primary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span id="btn-submit-label">Adicionar</span>
+          </button>
+        </form>
+
+        <!-- Nome Opcional da Playlist (exibido automaticamente quando list= é detectado) -->
+        <div id="playlist-name-row" class="playlist-name-row">
+          <span class="playlist-name-label">Playlist detectada:</span>
+          <input type="text" id="playlist-custom-name" class="playlist-name-input"
+            placeholder="Nome opcional da coleção (ex: Filmes Clássicos, Curso Python)..." />
+        </div>
+
+        <!-- Feedback Visual de Progresso ao Importar Playlist -->
+        <div id="import-progress-box" class="import-progress-box" aria-live="polite">
+          <div class="import-progress-top">
+            <span id="import-progress-label">Extraindo vídeos da playlist...</span>
+            <span id="import-progress-percent">0%</span>
+          </div>
+          <div class="import-bar-track">
+            <div id="import-bar-fill" class="import-bar-fill"></div>
+          </div>
+        </div>
+      </div>
+
+        <button type="button" id="btn-sidebar-restore-seed" class="btn-sidebar-action secondary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
             <polyline points="23 4 23 10 17 10"></polyline>
             <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
           </svg>
           <span>Sincronizar Banco Inicial</span>
         </button>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem;">
-          <button type="button" id="btn-sidebar-export" class="btn-sidebar-action secondary" style="font-size: 0.76rem; padding: 0.48rem;">
+          <button type="button" id="btn-sidebar-export" class="btn-sidebar-action secondary"
+            style="font-size: 0.76rem; padding: 0.48rem;">
             <span>Exportar JSON</span>
           </button>
-          <button type="button" id="btn-sidebar-import" class="btn-sidebar-action secondary" style="font-size: 0.76rem; padding: 0.48rem;">
+          <button type="button" id="btn-sidebar-import" class="btn-sidebar-action secondary"
+            style="font-size: 0.76rem; padding: 0.48rem;">
             <span>Importar JSON</span>
           </button>
         </div>
@@ -1469,7 +1980,9 @@
     <!-- ÁREA PRINCIPAL À DIREITA -->
     <main id="top" class="main-container">
       <!-- PLAYER DE CINEMA INTEGRADO (ABRE NO TOPO AO REPRODUZIR) -->
-      <section id="cinema-section" class="cinema-section" style="border-radius: var(--radius-lg); border: 1px solid var(--border-subtle);" aria-label="Player de Cinema GlauTube">
+      <section id="cinema-section" class="cinema-section"
+        style="border-radius: var(--radius-lg); border: 1px solid var(--border-subtle);"
+        aria-label="Player de Cinema GlauTube">
         <div class="cinema-wrapper">
           <div class="cinema-topbar">
             <div class="cinema-meta">
@@ -1484,7 +1997,8 @@
             </div>
 
             <button type="button" id="btn-close-cinema" class="btn-ghost" title="Fechar player">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
@@ -1494,12 +2008,22 @@
 
           <div class="player-aspect-box">
             <div id="yt-player-mount"></div>
+            <button type="button" id="btn-exit-fullscreen-overlay" class="btn-exit-fullscreen"
+              title="Sair da Tela Cheia (ESC)" aria-label="Sair da Tela Cheia">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              <span>Sair da Tela Cheia</span>
+            </button>
           </div>
 
           <div class="cinema-controls">
             <div class="control-group">
               <button type="button" id="btn-skip-back" class="btn-control" title="Voltar 15 segundos">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="1 4 1 10 7 10"></polyline>
                   <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
                 </svg>
@@ -1507,7 +2031,8 @@
               </button>
 
               <button type="button" id="btn-skip-forward" class="btn-control" title="Avançar 15 segundos">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="23 4 23 10 17 10"></polyline>
                   <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
                 </svg>
@@ -1515,21 +2040,24 @@
               </button>
 
               <button type="button" id="btn-restart-active" class="btn-control" title="Reiniciar do zero (00:00)">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round">
                   <polygon points="19 20 9 12 19 4 19 20"></polygon>
                   <line x1="5" y1="19" x2="5" y2="5"></line>
                 </svg>
                 <span>Reiniciar</span>
               </button>
 
-              <button type="button" id="btn-mark-completed" class="btn-control success" title="Marcar como concluído">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <button type="button" id="btn-mark-completed" class="btn-control success" title="Marcar como assistido">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                  stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
-                <span>Marcar Concluído</span>
+                <span>Marcar como assistido</span>
               </button>
 
-              <button type="button" id="btn-next-in-queue" class="btn-control accent" title="Reproduzir próximo vídeo da fila ou playlist">
+              <button type="button" id="btn-next-in-queue" class="btn-control accent"
+                title="Reproduzir próximo vídeo da fila ou playlist">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
                   <polygon points="5 4 15 12 5 20 5 4"></polygon>
                   <rect x="17" y="5" width="2.5" height="14"></rect>
@@ -1537,18 +2065,33 @@
                 <span>Próximo da Fila</span>
               </button>
 
+              <button type="button" id="btn-toggle-fullscreen" class="btn-control"
+                title="Tela Cheia (Ajustar à Tela sem zoom ou cortes)">
+                <svg class="icon-expand" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path
+                    d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3">
+                  </path>
+                </svg>
+                <svg class="icon-compress" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                  <path
+                    d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3">
+                  </path>
+                </svg>
+                <span id="label-toggle-fullscreen">Tela Cheia</span>
+              </button>
+
               <!-- Seletor rápido para mover o vídeo atual de playlist -->
-              <select
-                id="select-move-playlist"
-                aria-label="Mover vídeo para outra playlist"
-                style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.46rem 0.65rem; font-size: 0.8rem; font-weight: 600; outline: none; cursor: pointer;"
-              >
+              <select id="select-move-playlist" aria-label="Mover vídeo para outra playlist"
+                style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.46rem 0.65rem; font-size: 0.8rem; font-weight: 600; outline: none; cursor: pointer;">
                 <option value="">Minha Lista (Sem Playlist)</option>
               </select>
             </div>
 
             <div class="sync-status" id="sync-status-text">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.4"
+                stroke-linecap="round" stroke-linejoin="round">
                 <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                 <polyline points="17 21 17 13 7 13 7 21"></polyline>
                 <polyline points="7 3 7 8 15 8"></polyline>
@@ -1714,6 +2257,9 @@
       const syncStatusText = document.getElementById('sync-status-text');
       const btnNextInQueue = document.getElementById('btn-next-in-queue');
       const selectMovePlaylist = document.getElementById('select-move-playlist');
+      const playerAspectBox = document.querySelector('.player-aspect-box');
+      const btnToggleFullscreen = document.getElementById('btn-toggle-fullscreen');
+      const btnExitFullscreenOverlay = document.getElementById('btn-exit-fullscreen-overlay');
 
       const shelfContinue = document.getElementById('shelf-continue');
       const playlistsShelvesContainer = document.getElementById('playlists-shelves-container');
@@ -1963,7 +2509,7 @@
                   finish(list);
                   return;
                 }
-              } catch (e) {}
+              } catch (e) { }
             }
             finish([]);
           }, 8000);
@@ -2016,7 +2562,7 @@
                 events: {
                   onReady: (ev) => {
                     try {
-                      ev.target. mute();
+                      ev.target.mute();
                       ev.target.cuePlaylist({ listType: 'playlist', list: playlistId });
                       pollForPlaylistArray(ev.target);
                     } catch (e) {
@@ -2483,7 +3029,7 @@
 
         const totalVideos = state.videos.length;
         const continueCount = state.videos.filter((v) => isVideoInProgress(v)).length;
-        const standaloneCount = state.videos.filter((v) => !v.playlistId && !isVideoCompleted(v)).length;
+        const standaloneCount = state.videos.filter((v) => !v.playlistId).length;
         const completedCount = state.videos.filter((v) => isVideoCompleted(v)).length;
 
         const navItems = [
@@ -2542,7 +3088,7 @@
         sidebarPlaylistsList.innerHTML = '';
 
         if (playlistIds.length === 0) {
-          sidebarPlaylistsList.innerHTML = `<div class="sidebar-empty-hint">Nenhuma playlist ainda. Cole um link com <strong>list=</strong> na barra superior para importar.</div>`;
+          sidebarPlaylistsList.innerHTML = `<div class="sidebar-empty-hint">Nenhuma playlist ainda. Cole um link com <strong>list=</strong> no campo abaixo para importar.</div>`;
           return;
         }
 
@@ -2579,24 +3125,24 @@
             renderAll();
           };
 
-          const delBtn = document.createElement('button');
-          delBtn.type = 'button';
-          delBtn.className = 'sidebar-delete-pl-btn';
-          delBtn.title = `Excluir playlist "${pl.name}"`;
-          delBtn.setAttribute('aria-label', `Excluir playlist ${pl.name}`);
-          delBtn.innerHTML = `
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"></polyline>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          const menuBtn = document.createElement('button');
+          menuBtn.type = 'button';
+          menuBtn.className = 'sidebar-rename-pl-btn';
+          menuBtn.title = `Alterar playlist "${pl.name}"`;
+          menuBtn.setAttribute('aria-label', `Alterar playlist ${pl.name}`);
+          menuBtn.setAttribute('aria-haspopup', 'menu');
+          menuBtn.innerHTML = `
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle>
             </svg>
           `;
-          delBtn.onclick = (e) => {
+          menuBtn.onclick = (e) => {
             e.stopPropagation();
-            deleteEntirePlaylist(plId);
+            openPlaylistMenu(menuBtn, plId);
           };
 
           row.appendChild(selectBtn);
-          row.appendChild(delBtn);
+          row.appendChild(menuBtn);
           sidebarPlaylistsList.appendChild(row);
         });
       }
@@ -2609,7 +3155,7 @@
 
       function createVideoCard(video, contextType) {
         const card = document.createElement('article');
-        card.className = 'video-card' + (video.id === activeVideoId ? ' is-playing' : '');
+        card.className = 'video-card' + (video.id === activeVideoId ? ' is-playing' : '') + (isVideoCompleted(video) ? ' is-watched' : '');
 
         const pct = getProgressPercent(video);
         const completed = isVideoCompleted(video);
@@ -2644,6 +3190,13 @@
 
         thumbWrap.appendChild(img);
         thumbWrap.appendChild(overlay);
+
+        if (completed) {
+          const watchedBadge = document.createElement('span');
+          watchedBadge.className = 'badge-watched';
+          watchedBadge.textContent = 'Assistido';
+          thumbWrap.appendChild(watchedBadge);
+        }
 
         if (video.id === activeVideoId) {
           const playingBadge = document.createElement('span');
@@ -2698,7 +3251,7 @@
         metaRow.className = 'card-meta-row';
 
         if (completed) {
-          metaRow.innerHTML = `<span>100% Concluído</span><span>${video.duration > 0 ? formatTime(video.duration) : 'Finalizado'}</span>`;
+          metaRow.innerHTML = `<span>Assistido</span><span>${video.duration > 0 ? formatTime(video.duration) : 'Finalizado'}</span>`;
         } else if (inProgress) {
           const elapsedStr = video.duration > 0
             ? `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`
@@ -2738,17 +3291,17 @@
         }
         actions.appendChild(primaryBtn);
 
-        if (!completed) {
+        {
           const doneBtn = document.createElement('button');
           doneBtn.type = 'button';
-          doneBtn.className = 'btn-card-icon success';
-          doneBtn.title = 'Marcar como concluído';
+          doneBtn.className = 'btn-card-icon success' + (completed ? ' watched' : '');
+          doneBtn.title = completed ? 'Assistido (clique para desmarcar)' : 'Marcar como assistido';
           doneBtn.innerHTML = `
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
           `;
-          doneBtn.onclick = () => markVideoAsCompleted(video.id);
+          doneBtn.onclick = () => toggleWatched(video.id);
           actions.appendChild(doneBtn);
         }
 
@@ -2787,8 +3340,20 @@
         return card;
       }
 
+      function updateWatchedButton() {
+        const btn = document.getElementById('btn-mark-completed');
+        if (!btn) return;
+        const vid = activeVideoId ? state.videos.find((v) => v.id === activeVideoId) : null;
+        const watched = !!vid && isVideoCompleted(vid);
+        btn.classList.toggle('watched', watched);
+        btn.title = watched ? 'Assistido (clique para desmarcar)' : 'Marcar como assistido';
+        const label = btn.querySelector('span');
+        if (label) label.textContent = watched ? 'Assistido' : 'Marcar como assistido';
+      }
+
       function renderAll() {
         renderSidebar();
+        updateWatchedButton();
 
         if (activeVideoId) {
           const currentActive = state.videos.find((v) => v.id === activeVideoId);
@@ -2856,14 +3421,26 @@
             `;
             playFirstBtn.onclick = () => playPlaylistFromNextUnfinished(plId);
 
-            const delPlBtn = document.createElement('button');
-            delPlBtn.type = 'button';
-            delPlBtn.className = 'btn-ghost danger';
-            delPlBtn.textContent = 'Excluir Playlist';
-            delPlBtn.onclick = () => deleteEntirePlaylist(plId);
+            const editPlBtn = document.createElement('button');
+            editPlBtn.type = 'button';
+            editPlBtn.className = 'btn-ghost';
+            editPlBtn.title = 'Alterar playlist (renomear ou excluir)';
+            editPlBtn.setAttribute('aria-haspopup', 'menu');
+            editPlBtn.innerHTML = `
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+              </svg>
+              <span>Alterar</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            `;
+            editPlBtn.onclick = (ev) => {
+              ev.stopPropagation();
+              openPlaylistMenu(editPlBtn, plId);
+            };
 
             actionsGroup.appendChild(playFirstBtn);
-            actionsGroup.appendChild(delPlBtn);
+            actionsGroup.appendChild(editPlBtn);
 
             header.appendChild(titleGroup);
             header.appendChild(actionsGroup);
@@ -2887,12 +3464,12 @@
         sectionWatchlist.style.display = showWatchlist ? 'flex' : 'none';
 
         if (showWatchlist) {
-          const standaloneVideos = state.videos.filter((v) => !v.playlistId && !isVideoCompleted(v));
+          const standaloneVideos = state.videos.filter((v) => !v.playlistId);
           countWatchlist.textContent = standaloneVideos.length;
           shelfWatchlist.innerHTML = '';
 
           if (standaloneVideos.length === 0) {
-            shelfWatchlist.innerHTML = `<div class="empty-shelf">Nenhum vídeo avulso na Minha Lista. Cole um link do YouTube na barra superior para adicionar.</div>`;
+            shelfWatchlist.innerHTML = `<div class="empty-shelf">Nenhum vídeo avulso na Minha Lista. Cole um link do YouTube na barra lateral para adicionar.</div>`;
           } else {
             standaloneVideos.forEach((v) => shelfWatchlist.appendChild(createVideoCard(v, 'watchlist')));
           }
@@ -3008,7 +3585,6 @@
 
         const startSeconds = isVideoCompleted(video) ? 0 : Math.floor(video.currentTime || 0);
         if (isVideoCompleted(video)) {
-          video.completed = false;
           video.currentTime = 0;
         }
         video.lastWatched = Date.now();
@@ -3041,7 +3617,8 @@
             start: startSeconds,
             rel: 0,
             modestbranding: 1,
-            playsinline: 1
+            playsinline: 1,
+            fs: 1
           },
           events: {
             onReady: (ev) => {
@@ -3144,14 +3721,91 @@
           if (forceRender) {
             renderAll();
           }
-        } catch (e) {}
+        } catch (e) { }
+      }
+
+      // Funções de Tela Cheia com Fit-to-Screen Estrito (evita estouro e zoom)
+      function isFullscreenActive() {
+        return !!(
+          document.fullscreenElement ||
+          document.webkitFullscreenElement ||
+          document.mozFullScreenElement ||
+          document.msFullscreenElement ||
+          (playerAspectBox && playerAspectBox.classList.contains('is-fullscreen'))
+        );
+      }
+
+      function togglePlayerFullscreen() {
+        if (!activeVideoId) return;
+        if (isFullscreenActive()) {
+          exitPlayerFullscreen();
+        } else {
+          enterPlayerFullscreen();
+        }
+      }
+
+      function enterPlayerFullscreen() {
+        const box = playerAspectBox;
+        if (!box) return;
+        const req = box.requestFullscreen ||
+          box.webkitRequestFullscreen ||
+          box.mozRequestFullScreen ||
+          box.msRequestFullscreen;
+
+        if (req) {
+          req.call(box).catch(() => {
+            box.classList.add('is-fullscreen');
+            updateFullscreenUI(true);
+          });
+        } else {
+          box.classList.add('is-fullscreen');
+          updateFullscreenUI(true);
+        }
+      }
+
+      function exitPlayerFullscreen() {
+        const exit = document.exitFullscreen ||
+          document.webkitExitFullscreen ||
+          document.mozCancelFullScreen ||
+          document.msExitFullscreen;
+
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+          if (exit) {
+            exit.call(document).catch(() => { });
+          }
+        }
+        if (playerAspectBox) {
+          playerAspectBox.classList.remove('is-fullscreen');
+        }
+        updateFullscreenUI(false);
+      }
+
+      function updateFullscreenUI(active) {
+        if (!btnToggleFullscreen) return;
+        const iconExp = btnToggleFullscreen.querySelector('.icon-expand');
+        const iconComp = btnToggleFullscreen.querySelector('.icon-compress');
+        const label = document.getElementById('label-toggle-fullscreen');
+        if (active) {
+          if (iconExp) iconExp.style.display = 'none';
+          if (iconComp) iconComp.style.display = 'inline-block';
+          if (label) label.textContent = 'Ajustar / Sair';
+          document.body.classList.add('player-in-fullscreen');
+        } else {
+          if (iconExp) iconExp.style.display = 'inline-block';
+          if (iconComp) iconComp.style.display = 'none';
+          if (label) label.textContent = 'Tela Cheia';
+          document.body.classList.remove('player-in-fullscreen');
+        }
       }
 
       function closeCinemaPlayer() {
+        if (isFullscreenActive()) {
+          exitPlayerFullscreen();
+        }
         syncPlaybackProgress(false);
         stopAutoSaveLoop();
         if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
-          try { ytPlayer.pauseVideo(); } catch (e) {}
+          try { ytPlayer.pauseVideo(); } catch (e) { }
         }
         activeVideoId = null;
         cinemaSection.classList.remove('active');
@@ -3186,7 +3840,6 @@
         if (!video) return;
 
         video.completed = true;
-        if (video.duration > 0) video.currentTime = video.duration;
         video.lastWatched = Date.now();
         saveLibrary();
         renderAll();
@@ -3194,6 +3847,21 @@
         if (notify) {
           showToast(`Concluído: "${video.title}"`);
         }
+      }
+
+      function toggleWatched(videoId) {
+        const video = state.videos.find((v) => v.id === videoId);
+        if (!video) return;
+
+        if (isVideoCompleted(video)) {
+          video.completed = false;
+          const dur = Number(video.duration) || 0;
+          if (dur > 0 && (Number(video.currentTime) || 0) / dur >= 0.95) video.currentTime = 0;
+        } else {
+          video.completed = true;
+        }
+        saveLibrary();
+        renderAll();
       }
 
       function removeVideo(videoId) {
@@ -3220,10 +3888,107 @@
         });
       }
 
+      function renamePlaylist(playlistId) {
+        const pl = state.playlists[playlistId];
+        if (!pl) return;
+
+        const currentName = pl.name || '';
+        const newName = window.prompt(`Renomear playlist:`, currentName);
+        if (newName === null) return; // Usuário cancelou
+
+        const trimmed = newName.trim();
+        if (!trimmed) {
+          showToast('O nome da playlist não pode ficar vazio.');
+          return;
+        }
+
+        if (trimmed === currentName) return;
+
+        pl.name = trimmed;
+
+        // Atualiza o nome da playlist em todos os vídeos associados a ela
+        state.videos.forEach((v) => {
+          if (v.playlistId === playlistId) {
+            v.playlistName = trimmed;
+          }
+        });
+
+        // Se o player ativo estiver exibindo esta playlist, atualiza a tag
+        if (activeVideoId) {
+          const activeVid = state.videos.find((v) => v.id === activeVideoId);
+          if (activeVid && activeVid.playlistId === playlistId) {
+            cinemaPlaylistTag.textContent = `Playlist: ${trimmed}`;
+          }
+        }
+
+        saveLibrary();
+        renderAll();
+        showToast(`Playlist renomeada para "${trimmed}".`);
+      }
+
+      let playlistMenuEl = null;
+
+      function closePlaylistMenu() {
+        if (playlistMenuEl) {
+          playlistMenuEl.remove();
+          playlistMenuEl = null;
+        }
+      }
+
+      function openPlaylistMenu(anchor, playlistId) {
+        const wasOpenForSame = playlistMenuEl && playlistMenuEl.dataset.pl === playlistId && playlistMenuEl.dataset.anchor === (anchor.id || '');
+        closePlaylistMenu();
+        if (wasOpenForSame) return;
+
+        const menu = document.createElement('div');
+        menu.className = 'playlist-menu';
+        menu.setAttribute('role', 'menu');
+        menu.dataset.pl = playlistId;
+        menu.innerHTML = `
+          <button type="button" class="playlist-menu-item" data-act="rename" role="menuitem">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+            <span>Renomear</span>
+          </button>
+          <div class="playlist-menu-sep"></div>
+          <button type="button" class="playlist-menu-item danger" data-act="delete" role="menuitem">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            <span>Excluir playlist...</span>
+          </button>
+        `;
+        menu.addEventListener('click', (ev) => {
+          const btn = ev.target.closest('[data-act]');
+          if (!btn) return;
+          ev.stopPropagation();
+          const act = btn.dataset.act;
+          closePlaylistMenu();
+          if (act === 'rename') renamePlaylist(playlistId);
+          if (act === 'delete') deleteEntirePlaylist(playlistId);
+        });
+
+        document.body.appendChild(menu);
+        playlistMenuEl = menu;
+
+        const r = anchor.getBoundingClientRect();
+        const mw = menu.offsetWidth;
+        const mh = menu.offsetHeight;
+        let left = Math.min(Math.max(8, r.right - mw), window.innerWidth - mw - 8);
+        let top = r.bottom + 6;
+        if (top + mh > window.innerHeight - 8) top = Math.max(8, r.top - mh - 6);
+        menu.style.left = `${left}px`;
+        menu.style.top = `${top}px`;
+      }
+
+      document.addEventListener('click', closePlaylistMenu);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePlaylistMenu(); });
+      window.addEventListener('resize', closePlaylistMenu);
+
       function deleteEntirePlaylist(playlistId) {
         const plMeta = state.playlists[playlistId];
         if (!plMeta) return;
 
+        const total = state.videos.filter((v) => v.playlistId === playlistId).length;
+        const ok = window.confirm(`Excluir a playlist "${plMeta.name}" e seus ${total} vídeo(s)?\n\nVocê poderá desfazer logo após excluir.`);
+        if (!ok) return;
         const removedVideos = state.videos.filter((v) => v.playlistId === playlistId);
         state.videos = state.videos.filter((v) => v.playlistId !== playlistId);
         delete state.playlists[playlistId];
@@ -3404,16 +4169,7 @@
       });
 
       document.getElementById('btn-mark-completed').addEventListener('click', () => {
-        if (activeVideoId) {
-          const idDone = activeVideoId;
-          const nextVid = getNextVideoInQueue(idDone);
-          markVideoAsCompleted(idDone, true);
-          if (nextVid) {
-            openVideoInCinema(nextVid.id);
-          } else {
-            closeCinemaPlayer();
-          }
-        }
+        if (activeVideoId) toggleWatched(activeVideoId);
       });
 
       btnNextInQueue.addEventListener('click', () => {
@@ -3423,6 +4179,31 @@
           openVideoInCinema(nextVid.id);
         } else {
           showToast('Você já está no último vídeo da fila!');
+        }
+      });
+
+      if (btnToggleFullscreen) {
+        btnToggleFullscreen.addEventListener('click', togglePlayerFullscreen);
+      }
+
+      if (btnExitFullscreenOverlay) {
+        btnExitFullscreenOverlay.addEventListener('click', exitPlayerFullscreen);
+      }
+
+      const handleFullscreenChange = () => {
+        const active = !!(document.fullscreenElement || document.webkitFullscreenElement);
+        if (!active && playerAspectBox) {
+          playerAspectBox.classList.remove('is-fullscreen');
+        }
+        updateFullscreenUI(active);
+      };
+
+      document.addEventListener('fullscreenchange', handleFullscreenChange);
+      document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isFullscreenActive()) {
+          exitPlayerFullscreen();
         }
       });
 
@@ -3452,28 +4233,92 @@
       document.getElementById('btn-close-mobile-sidebar').addEventListener('click', closeMobileSidebar);
       sidebarBackdrop.addEventListener('click', closeMobileSidebar);
 
-      document.getElementById('btn-sidebar-quick-import').addEventListener('click', () => {
-        closeMobileSidebar();
-        urlInput.focus();
-        urlInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        showToast('Cole o link de um vídeo ou playlist do YouTube na barra superior.');
-      });
-
       document.getElementById('btn-sidebar-restore-seed').addEventListener('click', () => {
         closeMobileSidebar();
         fetchAndApplyGitHubSeed({ isFirstRun: false });
       });
 
-      document.getElementById('btn-reload-seed-top').addEventListener('click', () => {
-        fetchAndApplyGitHubSeed({ isFirstRun: false });
+      const btnSidebarExport = document.getElementById('btn-sidebar-export');
+      if (btnSidebarExport) {
+        btnSidebarExport.addEventListener('click', exportLibraryJson);
+      }
+
+      const btnSidebarImport = document.getElementById('btn-sidebar-import');
+      if (btnSidebarImport) {
+        btnSidebarImport.addEventListener('click', () => importFileInput.click());
+      }
+      importFileInput.addEventListener('change', (e) => importLibraryJson(e.target.files[0]));
+
+      // Controles do Menu de Perfil / Configurações Estilo Netflix
+      const btnNetflixMenu = document.getElementById('btn-netflix-menu');
+      const netflixDropdownMenu = document.getElementById('netflix-dropdown-menu');
+
+      function toggleNetflixMenu() {
+        if (!netflixDropdownMenu) return;
+        const isOpen = netflixDropdownMenu.classList.contains('active');
+        if (isOpen) {
+          closeNetflixMenu();
+        } else {
+          openNetflixMenu();
+        }
+      }
+
+      function openNetflixMenu() {
+        if (!netflixDropdownMenu) return;
+        netflixDropdownMenu.classList.add('active');
+        if (btnNetflixMenu) btnNetflixMenu.setAttribute('aria-expanded', 'true');
+      }
+
+      function closeNetflixMenu() {
+        if (!netflixDropdownMenu) return;
+        netflixDropdownMenu.classList.remove('active');
+        if (btnNetflixMenu) btnNetflixMenu.setAttribute('aria-expanded', 'false');
+      }
+
+      if (btnNetflixMenu) {
+        btnNetflixMenu.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleNetflixMenu();
+        });
+      }
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#netflix-menu-wrapper')) {
+          closeNetflixMenu();
+        }
       });
 
-      document.getElementById('btn-export-json').addEventListener('click', exportLibraryJson);
-      document.getElementById('btn-sidebar-export').addEventListener('click', exportLibraryJson);
+      const btnDropdownInstall = document.getElementById('btn-dropdown-install');
+      if (btnDropdownInstall) {
+        btnDropdownInstall.addEventListener('click', () => {
+          closeNetflixMenu();
+          handleInstallClick();
+        });
+      }
 
-      document.getElementById('btn-import-json').addEventListener('click', () => importFileInput.click());
-      document.getElementById('btn-sidebar-import').addEventListener('click', () => importFileInput.click());
-      importFileInput.addEventListener('change', (e) => importLibraryJson(e.target.files[0]));
+      const btnDropdownSeed = document.getElementById('btn-dropdown-seed');
+      if (btnDropdownSeed) {
+        btnDropdownSeed.addEventListener('click', () => {
+          closeNetflixMenu();
+          fetchAndApplyGitHubSeed({ isFirstRun: false });
+        });
+      }
+
+      const btnDropdownExport = document.getElementById('btn-dropdown-export');
+      if (btnDropdownExport) {
+        btnDropdownExport.addEventListener('click', () => {
+          closeNetflixMenu();
+          exportLibraryJson();
+        });
+      }
+
+      const btnDropdownImport = document.getElementById('btn-dropdown-import');
+      if (btnDropdownImport) {
+        btnDropdownImport.addEventListener('click', () => {
+          closeNetflixMenu();
+          importFileInput.click();
+        });
+      }
 
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'hidden') {
@@ -3486,8 +4331,67 @@
       });
 
       // ======================================================================
-      // PWA: manifest.json + registro do Service Worker (sw.js)
+      // PWA: manifest.json + registro do Service Worker + Instalação Discreta
       // ======================================================================
+      let deferredInstallPrompt = null;
+
+      function isPwaInstalled() {
+        if (window.matchMedia('(display-mode: standalone)').matches) return true;
+        if (window.matchMedia('(display-mode: fullscreen)').matches) return true;
+        if (window.navigator.standalone === true) return true;
+        if (document.referrer && document.referrer.includes('android-app://')) return true;
+        return false;
+      }
+
+      function showInstallButtons() {
+        if (isPwaInstalled()) {
+          hideInstallButtons();
+          return;
+        }
+        const dropdownItem = document.getElementById('dropdown-install-item');
+        const badgeDot = document.getElementById('netflix-install-badge-dot');
+        const pwaStatus = document.getElementById('dropdown-pwa-status');
+        const btnSidebar = document.getElementById('btn-sidebar-install-pwa');
+
+        if (dropdownItem) dropdownItem.style.display = 'block';
+        if (badgeDot) badgeDot.style.display = 'block';
+        if (pwaStatus) pwaStatus.textContent = 'Instalação Disponível';
+        if (btnSidebar) btnSidebar.style.display = 'inline-flex';
+      }
+
+      function hideInstallButtons() {
+        const dropdownItem = document.getElementById('dropdown-install-item');
+        const badgeDot = document.getElementById('netflix-install-badge-dot');
+        const pwaStatus = document.getElementById('dropdown-pwa-status');
+        const btnSidebar = document.getElementById('btn-sidebar-install-pwa');
+
+        if (dropdownItem) dropdownItem.style.display = 'none';
+        if (badgeDot) badgeDot.style.display = 'none';
+        if (pwaStatus) pwaStatus.textContent = isPwaInstalled() ? 'App Instalado (PWA)' : 'Modo Navegador Web';
+        if (btnSidebar) btnSidebar.style.display = 'none';
+      }
+
+      async function handleInstallClick() {
+        if (deferredInstallPrompt) {
+          deferredInstallPrompt.prompt();
+          try {
+            const { outcome } = await deferredInstallPrompt.userChoice;
+            if (outcome === 'accepted') {
+              hideInstallButtons();
+              showToast('GlauTube instalado com sucesso!');
+            }
+          } catch (e) {}
+          deferredInstallPrompt = null;
+        } else {
+          const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+          if (isIos) {
+            showToast('Para instalar no iOS: toque no botão Compartilhar (⎋) e escolha "Adicionar à Tela de Início".');
+          } else {
+            showToast('Para instalar: abra o menu do seu navegador (⋮) e selecione "Instalar aplicativo" ou "Adicionar à tela inicial".');
+          }
+        }
+      }
+
       function pwa() {
         if (!document.querySelector('link[rel="manifest"]')) {
           const link = document.createElement('link');
@@ -3507,6 +4411,32 @@
             navigator.serviceWorker.register('sw.js').catch((err) => console.warn('PWA: falha ao registrar o Service Worker', err));
           });
         }
+
+        const btnSidebar = document.getElementById('btn-sidebar-install-pwa');
+        if (btnSidebar) btnSidebar.addEventListener('click', handleInstallClick);
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          deferredInstallPrompt = e;
+          if (!isPwaInstalled()) {
+            showInstallButtons();
+          }
+        });
+
+        window.addEventListener('appinstalled', () => {
+          deferredInstallPrompt = null;
+          hideInstallButtons();
+          showToast('GlauTube instalado com sucesso!');
+        });
+
+        if (isPwaInstalled()) {
+          hideInstallButtons();
+        } else {
+          const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+          if (isIos) {
+            showInstallButtons();
+          }
+        }
       }
 
       // ======================================================================
@@ -3519,4 +4449,5 @@
     })();
   </script>
 </body>
+
 </html>
