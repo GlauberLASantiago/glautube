@@ -1695,7 +1695,7 @@
             <polyline points="23 4 23 10 17 10"></polyline>
             <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
           </svg>
-          <span>Sincronizar Banco Inicial</span>
+          <span>Atualizar o Catálogo</span>
         </button>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem;">
           <button type="button" id="btn-sidebar-export" class="btn-sidebar-action secondary"
@@ -2671,7 +2671,7 @@
           } else if (addedVideos > 0 || addedPlaylists > 0) {
             showToast(`Catálogo sincronizado: +${addedVideos} vídeo(s) e +${addedPlaylists} playlist(s).`);
           } else {
-            showToast('Seu catálogo já possui todos os vídeos do banco inicial!');
+            showToast('Seu catálogo já está atualizado com todos os vídeos!');
           }
         } catch (err) {
           console.warn('Aviso ao buscar banco inicial do GitHub:', err);

@@ -1,4 +1,4 @@
-const CACHE = 'glautube-shell-v13';
+const CACHE = 'glautube-shell-v14';
 const SHELL = ['./', './index.html', './manifest.json', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
