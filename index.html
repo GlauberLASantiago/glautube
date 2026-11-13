@@ -1803,10 +1803,11 @@
                 <span id="label-toggle-fullscreen">Tela Cheia</span>
               </button>
 
-              <!-- Seletor rápido para mover o vídeo atual de playlist -->
-              <select id="select-move-playlist" aria-label="Mover vídeo para outra playlist"
+              <!-- Seletor rápido para mover o vídeo atual para Minha Lista ou outra playlist -->
+              <label for="select-move-playlist" style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600; white-space: nowrap;">Mover para:</label>
+              <select id="select-move-playlist" aria-label="Mover filme para Minha Lista ou outra playlist" title="Mover filme para Minha Lista ou outra playlist"
                 style="background: #242424; color: #fff; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.46rem 0.65rem; font-size: 0.8rem; font-weight: 600; outline: none; cursor: pointer;">
-                <option value="">Minha Lista (Sem Playlist)</option>
+                <option value="">📌 Mover filme para Minha Lista</option>
               </select>
             </div>
 
@@ -2729,7 +2730,10 @@
       // ======================================================================
       function updatePlayerMovePlaylistSelect(currentVideo) {
         if (!selectMovePlaylist) return;
-        selectMovePlaylist.innerHTML = `<option value="">Minha Lista (Sem Playlist)</option>`;
+        const firstOptionText = (currentVideo && currentVideo.playlistId)
+          ? '📌 Mover filme para Minha Lista'
+          : '📌 Na Minha Lista (Avulso)';
+        selectMovePlaylist.innerHTML = `<option value="">${firstOptionText}</option>`;
         Object.values(state.playlists).forEach((pl) => {
           const opt = document.createElement('option');
           opt.value = pl.id;
@@ -3189,7 +3193,7 @@
           shelfWatchlist.innerHTML = '';
 
           if (standaloneVideos.length === 0) {
-            shelfWatchlist.innerHTML = `<div class="empty-shelf">Nenhum vídeo avulso na Minha Lista. Cole um link do YouTube na barra lateral para adicionar.</div>`;
+            shelfWatchlist.innerHTML = `<div class="empty-shelf">Nenhum filme na Minha Lista. Adicione um link em "+ Nova Playlist / Vídeo" ou, no player, escolha "📌 Mover filme para Minha Lista".</div>`;
           } else {
             standaloneVideos.forEach((v) => shelfWatchlist.appendChild(createVideoCard(v, 'watchlist')));
           }
@@ -3941,6 +3945,7 @@
           cinemaPlaylistTag.classList.add('visible');
           showToast(`Vídeo movido para a playlist "${video.playlistName}".`);
         }
+        updatePlayerMovePlaylistSelect(video);
         saveLibrary();
         renderAll();
       });
