@@ -1591,6 +1591,18 @@
         </a>
       </div>
 
+      <button type="button" id="btn-header-install-pwa" class="btn-ghost"
+        title="Instalar GlauTube como aplicativo"
+        style="display: none; align-items: center; gap: 0.42rem; padding: 0.45rem 0.78rem; border-color: rgba(229, 9, 20, 0.48); color: #ff858c; font-size: 0.82rem; font-weight: 600; white-space: nowrap;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="2" width="16" height="20" rx="3" ry="3"></rect>
+          <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          <polyline points="9 10 12 13 15 10"></polyline>
+          <line x1="12" y1="6" x2="12" y2="13"></line>
+        </svg>
+        <span>Instalar App</span>
+      </button>
+
       <input type="file" id="import-file-input" accept="application/json,.json" hidden />
     </div>
   </header>
@@ -1633,15 +1645,6 @@
 
       <!-- Ações Rápidas no Rodapé da Sidebar -->
       <div class="sidebar-footer-actions">
-        <button type="button" id="btn-sidebar-install-pwa" class="btn-sidebar-action secondary" title="Instalar GlauTube como aplicativo" style="display: none; border-color: rgba(229, 9, 20, 0.45); color: #ff858c;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="4" y="2" width="16" height="20" rx="3" ry="3"></rect>
-            <line x1="12" y1="18" x2="12.01" y2="18"></line>
-            <polyline points="9 10 12 13 15 10"></polyline>
-            <line x1="12" y1="6" x2="12" y2="13"></line>
-          </svg>
-          <span>Instalar Aplicativo (PWA)</span>
-        </button>
       <!-- Zona Unificada de Importação (Vídeo Individual ou Playlist Completa) -->
       <div class="import-zone sidebar-import-zone">
         <form id="import-form" class="add-bar" autocomplete="off">
@@ -3998,13 +4001,13 @@
           hideInstallButtons();
           return;
         }
-        const btnSidebar = document.getElementById('btn-sidebar-install-pwa');
-        if (btnSidebar) btnSidebar.style.display = 'inline-flex';
+        const btnHeader = document.getElementById('btn-header-install-pwa');
+        if (btnHeader) btnHeader.style.display = 'inline-flex';
       }
 
       function hideInstallButtons() {
-        const btnSidebar = document.getElementById('btn-sidebar-install-pwa');
-        if (btnSidebar) btnSidebar.style.display = 'none';
+        const btnHeader = document.getElementById('btn-header-install-pwa');
+        if (btnHeader) btnHeader.style.display = 'none';
       }
       async function handleInstallClick() {
         if (deferredInstallPrompt) {
@@ -4047,8 +4050,8 @@
           });
         }
 
-        const btnSidebar = document.getElementById('btn-sidebar-install-pwa');
-        if (btnSidebar) btnSidebar.addEventListener('click', handleInstallClick);
+        const btnHeader = document.getElementById('btn-header-install-pwa');
+        if (btnHeader) btnHeader.addEventListener('click', handleInstallClick);
 
         window.addEventListener('beforeinstallprompt', (e) => {
           e.preventDefault();
@@ -4067,10 +4070,7 @@
         if (isPwaInstalled()) {
           hideInstallButtons();
         } else {
-          const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-          if (isIos) {
-            showInstallButtons();
-          }
+          showInstallButtons();
         }
       }
 
