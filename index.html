@@ -8,6 +8,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#E50914" />
+  <link rel="manifest" href="manifest.json" />
   <title>GlauTube — Seu Streaming Pessoal</title>
   <!-- Favicon SVG personalizado do GlauTube (botão play vermelho estilizado) -->
   <link rel="icon" type="image/svg+xml"
@@ -4045,9 +4047,7 @@
         }
 
         if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
-          window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').catch((err) => console.warn('PWA: falha ao registrar o Service Worker', err));
-          });
+          navigator.serviceWorker.register('sw.js').catch((err) => console.warn('PWA: falha ao registrar o Service Worker', err));
         }
 
         const btnHeader = document.getElementById('btn-header-install-pwa');
@@ -4070,7 +4070,10 @@
         if (isPwaInstalled()) {
           hideInstallButtons();
         } else {
-          showInstallButtons();
+          const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+          if (isIos) {
+            showInstallButtons();
+          }
         }
       }
 
