@@ -562,39 +562,6 @@
       overflow: hidden !important;
     }
 
-    .btn-exit-fullscreen {
-      display: none;
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      z-index: 10000000;
-      background: rgba(18, 18, 18, 0.85);
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.28);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      padding: 0.55rem 0.95rem;
-      border-radius: var(--radius-sm);
-      font-size: 0.83rem;
-      font-weight: 600;
-      cursor: pointer;
-      align-items: center;
-      gap: 0.45rem;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.75);
-      transition: all var(--transition);
-    }
-
-    .btn-exit-fullscreen:hover {
-      background: var(--accent-red);
-      border-color: var(--accent-red-hover);
-    }
-
-    .player-aspect-box:fullscreen .btn-exit-fullscreen,
-    .player-aspect-box:-webkit-full-screen .btn-exit-fullscreen,
-    .player-aspect-box.is-fullscreen .btn-exit-fullscreen {
-      display: inline-flex;
-    }
-
     .cinema-controls {
       margin-top: 0.95rem;
       display: flex;
@@ -1763,15 +1730,6 @@
 
           <div class="player-aspect-box">
             <div id="yt-player-mount"></div>
-            <button type="button" id="btn-exit-fullscreen-overlay" class="btn-exit-fullscreen"
-              title="Sair da Tela Cheia (ESC)" aria-label="Sair da Tela Cheia">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-              <span>Sair da Tela Cheia</span>
-            </button>
           </div>
 
           <div class="cinema-controls">
@@ -2014,7 +1972,6 @@
       const selectMovePlaylist = document.getElementById('select-move-playlist');
       const playerAspectBox = document.querySelector('.player-aspect-box');
       const btnToggleFullscreen = document.getElementById('btn-toggle-fullscreen');
-      const btnExitFullscreenOverlay = document.getElementById('btn-exit-fullscreen-overlay');
 
       const shelfContinue = document.getElementById('shelf-continue');
       const playlistsShelvesContainer = document.getElementById('playlists-shelves-container');
@@ -3939,10 +3896,6 @@
 
       if (btnToggleFullscreen) {
         btnToggleFullscreen.addEventListener('click', togglePlayerFullscreen);
-      }
-
-      if (btnExitFullscreenOverlay) {
-        btnExitFullscreenOverlay.addEventListener('click', exitPlayerFullscreen);
       }
 
       const handleFullscreenChange = () => {
